@@ -1,0 +1,6 @@
+@Homigo.API_HostAddress = http://localhost:5075
+
+GET {{Homigo.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
