@@ -24,7 +24,10 @@ public class ServiceService : IServiceService
             {
                 Id = x.Id,
                 Name = x.Name,
+                Description = x.Description,
                 BasePrice = x.BasePrice,
+                EstimatedMinutes = x.EstimatedMinutes,
+                ImageUrl = x.ImageUrl,
                 CategoryId = x.CategoryId,
                 CategoryName = x.Category.Name
             })
@@ -44,7 +47,10 @@ public class ServiceService : IServiceService
         {
             Id = service.Id,
             Name = service.Name,
+            Description = service.Description,
             BasePrice = service.BasePrice,
+            EstimatedMinutes = service.EstimatedMinutes,
+            ImageUrl = service.ImageUrl,
             CategoryId = service.CategoryId,
             CategoryName = service.Category.Name
         };
@@ -61,8 +67,12 @@ public class ServiceService : IServiceService
         var service = new Service
         {
             Name = dto.Name,
+            Description = dto.Description,
             BasePrice = dto.BasePrice,
-            CategoryId = dto.CategoryId
+            EstimatedMinutes = dto.EstimatedMinutes,
+            ImageUrl = dto.ImageUrl,
+            CategoryId = dto.CategoryId,
+            IsActive = true
         };
 
         _context.Services.Add(service);
@@ -72,7 +82,10 @@ public class ServiceService : IServiceService
         {
             Id = service.Id,
             Name = service.Name,
+            Description = service.Description,
             BasePrice = service.BasePrice,
+            EstimatedMinutes = service.EstimatedMinutes,
+            ImageUrl = service.ImageUrl,
             CategoryId = service.CategoryId,
             CategoryName = category.Name
         };
@@ -86,7 +99,10 @@ public class ServiceService : IServiceService
             throw new Exception("Service not found.");
 
         service.Name = dto.Name;
+        service.Description = dto.Description;
         service.BasePrice = dto.BasePrice;
+        service.EstimatedMinutes = dto.EstimatedMinutes;
+        service.ImageUrl = dto.ImageUrl;
         service.CategoryId = dto.CategoryId;
 
         await _context.SaveChangesAsync();

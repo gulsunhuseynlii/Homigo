@@ -17,4 +17,15 @@ public class AppDbContext : DbContext
     public DbSet<Category> Categories => Set<Category>();
 
     public DbSet<Service> Services => Set<Service>();
+    public DbSet<ProviderProfile> ProviderProfiles => Set<ProviderProfile>();
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<ProviderProfile>()
+            .HasOne(x => x.User)
+            .WithOne(x => x.ProviderProfile)
+            .HasForeignKey<ProviderProfile>(x => x.UserId);
+    }
 }

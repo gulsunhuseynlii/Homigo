@@ -24,6 +24,7 @@ namespace Homigo.API
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<ICategoryService, CategoryService>();
             builder.Services.AddScoped<IServiceService, ServiceService>();
+            builder.Services.AddScoped<IProviderService, ProviderService>();
 
             builder.Services.AddSwaggerGen(options =>
             {
