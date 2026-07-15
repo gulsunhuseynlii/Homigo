@@ -1,9 +1,8 @@
 ﻿using Homigo.API.Configurations;
-using Homigo.API.Data;
 using Homigo.API.DTOs.Auth;
 using Homigo.API.Entities;
 using Homigo.API.Interfaces;
-using Microsoft.EntityFrameworkCore;
+using Homigo.API.Repositories.Interfaces;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -14,25 +13,28 @@ namespace Homigo.API.Services;
 
 public class AuthService : IAuthService
 {
-    private readonly AppDbContext _context;
+    private readonly IUserRepository _userRepository;
     private readonly JwtSettings _jwtSettings;
 
-    public AuthService(AppDbContext context, IOptions<JwtSettings> jwtOptions)
+    public AuthService(
+        IUserRepository userRepository,
+        IOptions<JwtSettings> jwtOptions)
     {
-        _context = context;
+        _userRepository = userRepository;
         _jwtSettings = jwtOptions.Value;
     }
 
     public async Task RegisterAsync(RegisterDto dto)
     {
-        var existingUser = await _context.Users
-            .FirstOrDefaultAsync(x => x.Email == dto.Email);
+        var existingUser = await _userRepository.GetByEmailAsync(dto.Email);
 
         if (existingUser != null)
             throw new Exception("Email already exists.");
 
-        var customerRole = await _context.Roles
-            .FirstAsync(x => x.Name == "Customer");
+        var customerRole = await _userRepository.GetCustomerRoleAsync();
+
+        if (customerRole == null)
+            throw new Exception("Customer role not found.");
 
         var user = new User
         {
@@ -43,32 +45,30 @@ public class AuthService : IAuthService
             RoleId = customerRole.Id
         };
 
-        _context.Users.Add(user);
-
-        await _context.SaveChangesAsync();
+        await _userRepository.AddAsync(user);
+        await _userRepository.SaveChangesAsync();
     }
 
     public async Task<LoginResponseDto> LoginAsync(LoginDto dto)
     {
-        var user = await _context.Users
-            .Include(x => x.Role)
-            .FirstOrDefaultAsync(x => x.Email == dto.Email);
+        var user = await _userRepository.GetByEmailWithRoleAsync(dto.Email);
 
         if (user == null)
             throw new Exception("Email or password is incorrect.");
 
-        bool isPasswordCorrect = BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash);
+        bool isPasswordCorrect =
+            BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash);
 
         if (!isPasswordCorrect)
             throw new Exception("Email or password is incorrect.");
 
         var claims = new List<Claim>
-    {
-        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-        new Claim(ClaimTypes.Name, user.FullName),
-        new Claim(ClaimTypes.Email, user.Email),
-        new Claim(ClaimTypes.Role, user.Role.Name)
-    };
+        {
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new Claim(ClaimTypes.Name, user.FullName),
+            new Claim(ClaimTypes.Email, user.Email),
+            new Claim(ClaimTypes.Role, user.Role.Name)
+        };
 
         var key = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(_jwtSettings.Key));
@@ -77,7 +77,8 @@ public class AuthService : IAuthService
             key,
             SecurityAlgorithms.HmacSha256);
 
-        var expiration = DateTime.UtcNow.AddMinutes(_jwtSettings.ExpireMinutes);
+        var expiration =
+            DateTime.UtcNow.AddMinutes(_jwtSettings.ExpireMinutes);
 
         var token = new JwtSecurityToken(
             issuer: _jwtSettings.Issuer,
@@ -92,6 +93,4 @@ public class AuthService : IAuthService
             Expiration = expiration
         };
     }
-
-
 }

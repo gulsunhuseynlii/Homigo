@@ -1,26 +1,35 @@
-﻿using Homigo.API.Data;
-using Homigo.API.DTOs.Provider;
+﻿using Homigo.API.DTOs.Provider;
 using Homigo.API.Entities;
 using Homigo.API.Interfaces;
-using Microsoft.EntityFrameworkCore;
+using Homigo.API.Repositories.Interfaces;
 
 namespace Homigo.API.Services;
 
 public class ProviderService : IProviderService
 {
-    private readonly AppDbContext _context;
+    private readonly IProviderRepository _providerRepository;
 
-    public ProviderService(AppDbContext context)
+    public ProviderService(IProviderRepository providerRepository)
     {
-        _context = context;
+        _providerRepository = providerRepository;
     }
 
     public async Task ApplyAsync(int userId, ApplyProviderDto dto)
     {
-        var exists = await _context.ProviderProfiles
-            .AnyAsync(x => x.UserId == userId);
+        var user = await _providerRepository.GetUserWithRoleAsync(userId);
 
-        if (exists)
+        if (user == null)
+            throw new Exception("User not found.");
+
+        if (user.Role.Name == "Admin")
+            throw new Exception("Admin cannot apply as provider.");
+
+        if (user.Role.Name == "Provider")
+            throw new Exception("You are already a provider.");
+
+        var exists = await _providerRepository.GetByUserIdAsync(userId);
+
+        if (exists != null)
             throw new Exception("You have already applied.");
 
         var provider = new ProviderProfile
@@ -31,43 +40,44 @@ public class ProviderService : IProviderService
             IsApproved = false
         };
 
-        _context.ProviderProfiles.Add(provider);
-
-        await _context.SaveChangesAsync();
+        await _providerRepository.AddAsync(provider);
+        await _providerRepository.SaveChangesAsync();
     }
+
     public async Task<List<ProviderApplicationDto>> GetPendingApplicationsAsync()
     {
-        return await _context.ProviderProfiles
-            .Include(x => x.User)
-            .Where(x => !x.IsApproved)
-            .Select(x => new ProviderApplicationDto
-            {
-                UserId = x.UserId,
-                FullName = x.User.FullName,
-                Bio = x.Bio,
-                YearsOfExperience = x.YearsOfExperience,
-                IsApproved = x.IsApproved
-            })
-            .ToListAsync();
+        var providers = await _providerRepository.GetPendingAsync();
+
+        return providers.Select(x => new ProviderApplicationDto
+        {
+            UserId = x.UserId,
+            FullName = x.User.FullName,
+            Bio = x.Bio,
+            YearsOfExperience = x.YearsOfExperience,
+            IsApproved = x.IsApproved
+        }).ToList();
     }
+
     public async Task ApproveAsync(int userId)
     {
-        var provider = await _context.ProviderProfiles
-            .FirstOrDefaultAsync(x => x.UserId == userId);
+        var provider = await _providerRepository.GetByUserIdAsync(userId);
 
         if (provider == null)
             throw new Exception("Provider application not found.");
 
+        var providerRole = await _providerRepository.GetProviderRoleAsync();
+
+        if (providerRole == null)
+            throw new Exception("Provider role not found.");
+
+        var user = await _providerRepository.GetUserWithRoleAsync(userId);
+
+        if (user == null)
+            throw new Exception("User not found.");
+
         provider.IsApproved = true;
-
-        var providerRole = await _context.Roles
-            .FirstAsync(x => x.Name == "Provider");
-
-        var user = await _context.Users
-            .FirstAsync(x => x.Id == userId);
-
         user.RoleId = providerRole.Id;
 
-        await _context.SaveChangesAsync();
+        await _providerRepository.SaveChangesAsync();
     }
 }

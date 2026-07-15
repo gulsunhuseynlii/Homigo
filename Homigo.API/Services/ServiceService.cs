@@ -2,43 +2,40 @@
 using Homigo.API.DTOs.Service;
 using Homigo.API.Entities;
 using Homigo.API.Interfaces;
+using Homigo.API.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace Homigo.API.Services;
 
 public class ServiceService : IServiceService
 {
-    private readonly AppDbContext _context;
+    private readonly IServiceRepository _serviceRepository;
 
-    public ServiceService(AppDbContext context)
+    public ServiceService(IServiceRepository serviceRepository)
     {
-        _context = context;
+        _serviceRepository = serviceRepository;
     }
 
     public async Task<List<ServiceDto>> GetAllAsync()
     {
-        return await _context.Services
-            .Include(x => x.Category)
-            .Where(x => !x.IsDeleted)
-            .Select(x => new ServiceDto
-            {
-                Id = x.Id,
-                Name = x.Name,
-                Description = x.Description,
-                BasePrice = x.BasePrice,
-                EstimatedMinutes = x.EstimatedMinutes,
-                ImageUrl = x.ImageUrl,
-                CategoryId = x.CategoryId,
-                CategoryName = x.Category.Name
-            })
-            .ToListAsync();
+        var services = await _serviceRepository.GetAllWithCategoryAsync();
+
+        return services.Select(x => new ServiceDto
+        {
+            Id = x.Id,
+            Name = x.Name,
+            Description = x.Description,
+            BasePrice = x.BasePrice,
+            EstimatedMinutes = x.EstimatedMinutes,
+            ImageUrl = x.ImageUrl,
+            CategoryId = x.CategoryId,
+            CategoryName = x.Category.Name
+        }).ToList();
     }
 
     public async Task<ServiceDto?> GetByIdAsync(int id)
     {
-        var service = await _context.Services
-            .Include(x => x.Category)
-            .FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted);
+        var service = await _serviceRepository.GetByIdWithCategoryAsync(id);
 
         if (service == null)
             return null;
@@ -58,8 +55,7 @@ public class ServiceService : IServiceService
 
     public async Task<ServiceDto> CreateAsync(CreateServiceDto dto)
     {
-        var category = await _context.Categories
-            .FirstOrDefaultAsync(x => x.Id == dto.CategoryId && !x.IsDeleted);
+        var category = await _serviceRepository.GetCategoryByIdAsync(dto.CategoryId);
 
         if (category == null)
             throw new Exception("Category not found.");
@@ -75,8 +71,9 @@ public class ServiceService : IServiceService
             IsActive = true
         };
 
-        _context.Services.Add(service);
-        await _context.SaveChangesAsync();
+        await _serviceRepository.AddAsync(service);
+
+        await _serviceRepository.SaveChangesAsync();
 
         return new ServiceDto
         {
@@ -93,10 +90,15 @@ public class ServiceService : IServiceService
 
     public async Task UpdateAsync(int id, UpdateServiceDto dto)
     {
-        var service = await _context.Services.FindAsync(id);
+        var service = await _serviceRepository.GetEntityByIdAsync(id);
 
-        if (service == null || service.IsDeleted)
+        if (service == null)
             throw new Exception("Service not found.");
+
+        var category = await _serviceRepository.GetCategoryByIdAsync(dto.CategoryId);
+
+        if (category == null)
+            throw new Exception("Category not found.");
 
         service.Name = dto.Name;
         service.Description = dto.Description;
@@ -105,18 +107,20 @@ public class ServiceService : IServiceService
         service.ImageUrl = dto.ImageUrl;
         service.CategoryId = dto.CategoryId;
 
-        await _context.SaveChangesAsync();
+        await _serviceRepository.UpdateAsync(service);
+        await _serviceRepository.SaveChangesAsync();
     }
 
     public async Task DeleteAsync(int id)
     {
-        var service = await _context.Services.FindAsync(id);
+        var service = await _serviceRepository.GetEntityByIdAsync(id);
 
-        if (service == null || service.IsDeleted)
+        if (service == null)
             throw new Exception("Service not found.");
 
         service.IsDeleted = true;
 
-        await _context.SaveChangesAsync();
+        await _serviceRepository.UpdateAsync(service);
+        await _serviceRepository.SaveChangesAsync();
     }
 }
