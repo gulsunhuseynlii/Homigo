@@ -18,6 +18,8 @@ public class AppDbContext : DbContext
 
     public DbSet<Service> Services => Set<Service>();
     public DbSet<ProviderProfile> ProviderProfiles => Set<ProviderProfile>();
+    public DbSet<Address> Addresses => Set<Address>();
+    public DbSet<Order> Orders => Set<Order>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -27,5 +29,32 @@ public class AppDbContext : DbContext
             .HasOne(x => x.User)
             .WithOne(x => x.ProviderProfile)
             .HasForeignKey<ProviderProfile>(x => x.UserId);
+
+        modelBuilder.Entity<Address>()
+            .HasOne(x => x.User)
+            .WithMany(x => x.Addresses)
+            .HasForeignKey(x => x.UserId);
+
+        modelBuilder.Entity<Order>()
+            .HasOne(x => x.Customer)
+            .WithMany(x => x.CustomerOrders)
+            .HasForeignKey(x => x.CustomerId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<Order>()
+            .HasOne(x => x.Provider)
+            .WithMany(x => x.ProviderOrders)
+            .HasForeignKey(x => x.ProviderId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<Order>()
+            .HasOne(x => x.Service)
+            .WithMany(x => x.Orders)
+            .HasForeignKey(x => x.ServiceId);
+
+        modelBuilder.Entity<Order>()
+            .HasOne(x => x.Address)
+            .WithMany(x => x.Orders)
+            .HasForeignKey(x => x.AddressId);
     }
 }

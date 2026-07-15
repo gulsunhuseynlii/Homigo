@@ -4,6 +4,7 @@ using Homigo.API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Homigo.API.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260715165327_AddAddress")]
+    partial class AddAddress
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -106,57 +109,6 @@ namespace Homigo.API.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Categories");
-                });
-
-            modelBuilder.Entity("Homigo.API.Entities.Order", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AddressId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("CustomerId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<int?>("ProviderId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("ScheduledDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("ServiceId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("TotalPrice")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AddressId");
-
-                    b.HasIndex("CustomerId");
-
-                    b.HasIndex("ProviderId");
-
-                    b.HasIndex("ServiceId");
-
-                    b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("Homigo.API.Entities.ProviderProfile", b =>
@@ -336,40 +288,6 @@ namespace Homigo.API.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Homigo.API.Entities.Order", b =>
-                {
-                    b.HasOne("Homigo.API.Entities.Address", "Address")
-                        .WithMany("Orders")
-                        .HasForeignKey("AddressId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Homigo.API.Entities.User", "Customer")
-                        .WithMany("CustomerOrders")
-                        .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Homigo.API.Entities.User", "Provider")
-                        .WithMany("ProviderOrders")
-                        .HasForeignKey("ProviderId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Homigo.API.Entities.Service", "Service")
-                        .WithMany("Orders")
-                        .HasForeignKey("ServiceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Address");
-
-                    b.Navigation("Customer");
-
-                    b.Navigation("Provider");
-
-                    b.Navigation("Service");
-                });
-
             modelBuilder.Entity("Homigo.API.Entities.ProviderProfile", b =>
                 {
                     b.HasOne("Homigo.API.Entities.User", "User")
@@ -403,11 +321,6 @@ namespace Homigo.API.Migrations
                     b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("Homigo.API.Entities.Address", b =>
-                {
-                    b.Navigation("Orders");
-                });
-
             modelBuilder.Entity("Homigo.API.Entities.Category", b =>
                 {
                     b.Navigation("Services");
@@ -418,18 +331,9 @@ namespace Homigo.API.Migrations
                     b.Navigation("Users");
                 });
 
-            modelBuilder.Entity("Homigo.API.Entities.Service", b =>
-                {
-                    b.Navigation("Orders");
-                });
-
             modelBuilder.Entity("Homigo.API.Entities.User", b =>
                 {
                     b.Navigation("Addresses");
-
-                    b.Navigation("CustomerOrders");
-
-                    b.Navigation("ProviderOrders");
 
                     b.Navigation("ProviderProfile");
                 });

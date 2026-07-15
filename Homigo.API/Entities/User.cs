@@ -18,4 +18,8 @@ public class User : BaseEntity
 
     public Role Role { get; set; } = null!;
     public ProviderProfile? ProviderProfile { get; set; }
+    public ICollection<Address> Addresses { get; set; } = new List<Address>();
+    public ICollection<Order> CustomerOrders { get; set; } = new List<Order>();
+
+    public ICollection<Order> ProviderOrders { get; set; } = new List<Order>();
 }
