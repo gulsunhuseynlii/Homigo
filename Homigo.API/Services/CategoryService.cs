@@ -1,31 +1,23 @@
-﻿using Homigo.API.Data;
+﻿
 using Homigo.API.DTOs.Category;
 using Homigo.API.Entities;
 using Homigo.API.Interfaces;
-using Microsoft.EntityFrameworkCore;
+using Homigo.API.Repositories.Interfaces;
 
 namespace Homigo.API.Services;
 
 public class CategoryService : ICategoryService
 {
-    private readonly AppDbContext _context;
+    private readonly ICategoryRepository _categoryRepository;
 
-    public CategoryService(AppDbContext context)
+    public CategoryService(ICategoryRepository categoryRepository)
     {
-        _context = context;
+        _categoryRepository = categoryRepository;
     }
 
     public async Task<List<CategoryDto>> GetAllAsync()
     {
-        return await _context.Categories
-            .Where(x => !x.IsDeleted)
-            .Select(x => new CategoryDto
-            {
-                Id = x.Id,
-                Name = x.Name,
-                Icon = x.Icon
-            })
-            .ToListAsync();
+        return await _categoryRepository.GetAllAsync();
     }
 
     public async Task<CategoryDto> CreateAsync(CreateCategoryDto dto)
@@ -37,9 +29,9 @@ public class CategoryService : ICategoryService
             CreatedAt = DateTime.UtcNow
         };
 
-        _context.Categories.Add(category);
+        await _categoryRepository.AddAsync(category);
 
-        await _context.SaveChangesAsync();
+        await _categoryRepository.SaveChangesAsync();
 
         return new CategoryDto
         {

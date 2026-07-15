@@ -2,6 +2,8 @@
 using Homigo.API.Configurations;
 using Homigo.API.Data;
 using Homigo.API.Interfaces;
+using Homigo.API.Repositories.Implementations;
+using Homigo.API.Repositories.Interfaces;
 using Homigo.API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -25,6 +27,8 @@ namespace Homigo.API
             builder.Services.AddScoped<ICategoryService, CategoryService>();
             builder.Services.AddScoped<IServiceService, ServiceService>();
             builder.Services.AddScoped<IProviderService, ProviderService>();
+            builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+            builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 
             builder.Services.AddSwaggerGen(options =>
             {
