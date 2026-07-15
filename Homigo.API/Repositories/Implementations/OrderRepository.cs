@@ -1,5 +1,6 @@
 ﻿using Homigo.API.Data;
 using Homigo.API.Entities;
+using Homigo.API.Enums;
 using Homigo.API.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -38,5 +39,43 @@ public class OrderRepository : GenericRepository<Order>, IOrderRepository
             .Include(x => x.Provider)
             .Where(x => x.CustomerId == userId && !x.IsDeleted)
             .ToListAsync();
+    }
+    public async Task<List<Order>> GetPendingOrdersAsync()
+    {
+        return await _context.Orders
+            .Include(x => x.Customer)
+            .Include(x => x.Service)
+            .Include(x => x.Address)
+            .Where(x => x.Status == OrderStatus.Pending)
+            .ToListAsync();
+    }
+
+    public async Task<Order?> GetOrderByIdAsync(int id)
+    {
+        return await _context.Orders
+            .FirstOrDefaultAsync(x => x.Id == id);
+    }
+
+    public async Task<ProviderProfile?> GetProviderProfileAsync(int userId)
+    {
+        return await _context.ProviderProfiles
+            .FirstOrDefaultAsync(x => x.UserId == userId && x.IsApproved);
+    }
+    public async Task<List<Order>> GetProviderOrdersAsync(int providerUserId)
+    {
+        return await _context.Orders
+            .Include(x => x.Customer)
+            .Include(x => x.Service)
+            .Include(x => x.Address)
+            .Where(x => x.ProviderId == providerUserId)
+            .ToListAsync();
+    }
+
+    public async Task<Order?> GetProviderOrderAsync(int orderId, int providerUserId)
+    {
+        return await _context.Orders
+            .FirstOrDefaultAsync(x =>
+                x.Id == orderId &&
+                x.ProviderId == providerUserId);
     }
 }

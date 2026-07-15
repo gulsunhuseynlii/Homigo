@@ -56,4 +56,85 @@ public class OrderService : IOrderService
             ProviderName = x.Provider?.FullName
         }).ToList();
     }
+    public async Task<List<OrderDto>> GetPendingOrdersAsync()
+    {
+        var orders = await _orderRepository.GetPendingOrdersAsync();
+
+        return orders.Select(x => new OrderDto
+        {
+            Id = x.Id,
+            ServiceName = x.Service.Name,
+            AddressTitle = x.Address.Title,
+            TotalPrice = x.TotalPrice,
+            ScheduledDate = x.ScheduledDate,
+            Status = x.Status.ToString(),
+            ProviderName = null
+        }).ToList();
+    }
+    public async Task AcceptOrderAsync(int orderId, int providerUserId)
+    {
+        var provider = await _orderRepository.GetProviderProfileAsync(providerUserId);
+
+        if (provider == null)
+            throw new Exception("Provider profile not found.");
+
+        var order = await _orderRepository.GetOrderByIdAsync(orderId);
+
+        if (order == null)
+            throw new Exception("Order not found.");
+
+        if (order.Status != OrderStatus.Pending)
+            throw new Exception("Order is not pending.");
+
+        order.ProviderId = providerUserId;
+        order.Status = OrderStatus.Accepted;
+
+        await _orderRepository.UpdateAsync(order);
+        await _orderRepository.SaveChangesAsync();
+    }
+    public async Task<List<OrderDto>> GetMyProviderOrdersAsync(int providerUserId)
+    {
+        var orders = await _orderRepository.GetProviderOrdersAsync(providerUserId);
+
+        return orders.Select(x => new OrderDto
+        {
+            Id = x.Id,
+            ServiceName = x.Service.Name,
+            AddressTitle = x.Address.Title,
+            TotalPrice = x.TotalPrice,
+            ScheduledDate = x.ScheduledDate,
+            Status = x.Status.ToString(),
+            ProviderName = null
+        }).ToList();
+    }
+    public async Task StartOrderAsync(int orderId, int providerUserId)
+    {
+        var order = await _orderRepository.GetProviderOrderAsync(orderId, providerUserId);
+
+        if (order == null)
+            throw new Exception("Order not found.");
+
+        if (order.Status != OrderStatus.Accepted)
+            throw new Exception("Order must be accepted first.");
+
+        order.Status = OrderStatus.InProgress;
+
+        await _orderRepository.UpdateAsync(order);
+        await _orderRepository.SaveChangesAsync();
+    }
+    public async Task CompleteOrderAsync(int orderId, int providerUserId)
+    {
+        var order = await _orderRepository.GetProviderOrderAsync(orderId, providerUserId);
+
+        if (order == null)
+            throw new Exception("Order not found.");
+
+        if (order.Status != OrderStatus.InProgress)
+            throw new Exception("Order is not in progress.");
+
+        order.Status = OrderStatus.Completed;
+
+        await _orderRepository.UpdateAsync(order);
+        await _orderRepository.SaveChangesAsync();
+    }
 }

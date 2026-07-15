@@ -1,6 +1,5 @@
 ﻿using Homigo.API.Entities;
-
-namespace Homigo.API.Repositories.Interfaces;
+using Homigo.API.Repositories.Interfaces;
 
 public interface IOrderRepository : IGenericRepository<Order>
 {
@@ -9,4 +8,14 @@ public interface IOrderRepository : IGenericRepository<Order>
     Task<Address?> GetAddressAsync(int addressId, int userId);
 
     Task<List<Order>> GetCustomerOrdersAsync(int userId);
+
+    Task<List<Order>> GetPendingOrdersAsync();
+
+    Task<Order?> GetOrderByIdAsync(int id);
+
+    Task<ProviderProfile?> GetProviderProfileAsync(int userId);
+
+    Task<List<Order>> GetProviderOrdersAsync(int providerUserId);
+
+    Task<Order?> GetProviderOrderAsync(int orderId, int providerUserId);
 }
