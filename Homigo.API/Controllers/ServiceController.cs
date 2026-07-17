@@ -17,10 +17,11 @@ public class ServiceController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll([FromQuery] ServiceQueryDto query)
     {
-        var services = await _serviceService.GetAllAsync();
-        return Ok(services);
+        var result = await _serviceService.GetAllAsync(query);
+
+        return Ok(result);
     }
 
     [HttpGet("{id}")]

@@ -12,4 +12,5 @@ public interface IServiceRepository : IGenericRepository<Service>
     Task<Service?> GetEntityByIdAsync(int id);
 
     Task<Category?> GetCategoryByIdAsync(int id);
+    Task<List<Service>> GetAllAsync(ServiceQueryDto query);
 }

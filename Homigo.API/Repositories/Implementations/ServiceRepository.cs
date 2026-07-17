@@ -42,4 +42,43 @@ public class ServiceRepository
         return await _context.Services
             .FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted);
     }
+    public async Task<List<Service>> GetAllAsync(ServiceQueryDto query)
+    {
+        var services = _context.Services
+            .Include(x => x.Category)
+            .Where(x => !x.IsDeleted)
+            .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(query.Search))
+        {
+            services = services.Where(x =>
+                x.Name.ToLower().Contains(query.Search.ToLower()));
+        }
+
+        if (query.CategoryId.HasValue)
+        {
+            services = services.Where(x =>
+                x.CategoryId == query.CategoryId.Value);
+        }
+
+        if (!string.IsNullOrWhiteSpace(query.Sort))
+        {
+            switch (query.Sort.ToLower())
+            {
+                case "price":
+                    services = services.OrderBy(x => x.BasePrice);
+                    break;
+
+                case "name":
+                    services = services.OrderBy(x => x.Name);
+                    break;
+            }
+        }
+
+        services = services
+            .Skip((query.Page - 1) * query.PageSize)
+            .Take(query.PageSize);
+
+        return await services.ToListAsync();
+    }
 }

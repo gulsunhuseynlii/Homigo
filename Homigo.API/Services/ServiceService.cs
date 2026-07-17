@@ -16,9 +16,9 @@ public class ServiceService : IServiceService
         _serviceRepository = serviceRepository;
     }
 
-    public async Task<List<ServiceDto>> GetAllAsync()
+    public async Task<List<ServiceDto>> GetAllAsync(ServiceQueryDto query)
     {
-        var services = await _serviceRepository.GetAllWithCategoryAsync();
+        var services = await _serviceRepository.GetAllAsync(query);
 
         return services.Select(x => new ServiceDto
         {
@@ -26,9 +26,6 @@ public class ServiceService : IServiceService
             Name = x.Name,
             Description = x.Description,
             BasePrice = x.BasePrice,
-            EstimatedMinutes = x.EstimatedMinutes,
-            ImageUrl = x.ImageUrl,
-            CategoryId = x.CategoryId,
             CategoryName = x.Category.Name
         }).ToList();
     }

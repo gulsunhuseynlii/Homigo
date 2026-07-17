@@ -4,7 +4,7 @@ namespace Homigo.API.Interfaces;
 
 public interface IServiceService
 {
-    Task<List<ServiceDto>> GetAllAsync();
+    Task<List<ServiceDto>> GetAllAsync(ServiceQueryDto query);
 
     Task<ServiceDto?> GetByIdAsync(int id);
 
