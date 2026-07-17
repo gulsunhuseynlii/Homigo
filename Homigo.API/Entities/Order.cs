@@ -25,4 +25,5 @@ public class Order : BaseEntity
     public decimal TotalPrice { get; set; }
 
     public OrderStatus Status { get; set; }
+    public Review? Review { get; set; }
 }

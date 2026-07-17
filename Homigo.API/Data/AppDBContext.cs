@@ -20,6 +20,7 @@ public class AppDbContext : DbContext
     public DbSet<ProviderProfile> ProviderProfiles => Set<ProviderProfile>();
     public DbSet<Address> Addresses => Set<Address>();
     public DbSet<Order> Orders => Set<Order>();
+    public DbSet<Review> Reviews { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -56,5 +57,21 @@ public class AppDbContext : DbContext
             .HasOne(x => x.Address)
             .WithMany(x => x.Orders)
             .HasForeignKey(x => x.AddressId);
+        modelBuilder.Entity<Review>()
+            .HasOne(x => x.Order)
+            .WithOne(x => x.Review)
+            .HasForeignKey<Review>(x => x.OrderId);
+
+        modelBuilder.Entity<Review>()
+            .HasOne(x => x.Customer)
+            .WithMany(x => x.CustomerReviews)
+            .HasForeignKey(x => x.CustomerId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        modelBuilder.Entity<Review>()
+            .HasOne(x => x.Provider)
+            .WithMany(x => x.ProviderReviews)
+            .HasForeignKey(x => x.ProviderId)
+            .OnDelete(DeleteBehavior.NoAction);
     }
 }

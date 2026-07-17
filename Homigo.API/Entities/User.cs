@@ -22,4 +22,7 @@ public class User : BaseEntity
     public ICollection<Order> CustomerOrders { get; set; } = new List<Order>();
 
     public ICollection<Order> ProviderOrders { get; set; } = new List<Order>();
+    public ICollection<Review> CustomerReviews { get; set; } = new List<Review>();
+
+    public ICollection<Review> ProviderReviews { get; set; } = new List<Review>();
 }

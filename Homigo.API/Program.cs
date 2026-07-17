@@ -29,6 +29,7 @@ namespace Homigo.API
             builder.Services.AddScoped<IProviderService, ProviderService>();
             builder.Services.AddScoped<IAddressService, AddressService>();
             builder.Services.AddScoped<IOrderService, OrderService>();
+            builder.Services.AddScoped<IReviewService, ReviewService>();
 
             builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
@@ -37,6 +38,7 @@ namespace Homigo.API
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IAddressRepository, AddressRepository>();
             builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+            builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 
             builder.Services.AddSwaggerGen(options =>
             {
