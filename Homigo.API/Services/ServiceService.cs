@@ -26,10 +26,12 @@ public class ServiceService : IServiceService
             Name = x.Name,
             Description = x.Description,
             BasePrice = x.BasePrice,
+            EstimatedMinutes = x.EstimatedMinutes,
+            ImageUrl = x.ImageUrl,
+            CategoryId = x.CategoryId,
             CategoryName = x.Category.Name
         }).ToList();
     }
-
     public async Task<ServiceDto?> GetByIdAsync(int id)
     {
         var service = await _serviceRepository.GetByIdWithCategoryAsync(id);
@@ -49,7 +51,6 @@ public class ServiceService : IServiceService
             CategoryName = service.Category.Name
         };
     }
-
     public async Task<ServiceDto> CreateAsync(CreateServiceDto dto)
     {
         var category = await _serviceRepository.GetCategoryByIdAsync(dto.CategoryId);

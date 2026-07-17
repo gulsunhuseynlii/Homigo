@@ -21,6 +21,7 @@ public class AppDbContext : DbContext
     public DbSet<Address> Addresses => Set<Address>();
     public DbSet<Order> Orders => Set<Order>();
     public DbSet<Review> Reviews { get; set; }
+    public DbSet<Payment> Payments { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -73,5 +74,9 @@ public class AppDbContext : DbContext
             .WithMany(x => x.ProviderReviews)
             .HasForeignKey(x => x.ProviderId)
             .OnDelete(DeleteBehavior.NoAction);
+        modelBuilder.Entity<Payment>()
+    .HasOne(x => x.Order)
+    .WithOne(x => x.Payment)
+    .HasForeignKey<Payment>(x => x.OrderId);
     }
 }

@@ -1,4 +1,5 @@
-﻿using Homigo.API.DTOs.Service;
+﻿using Homigo.API.DTOs.Common;
+using Homigo.API.DTOs.Service;
 
 namespace Homigo.API.Interfaces;
 

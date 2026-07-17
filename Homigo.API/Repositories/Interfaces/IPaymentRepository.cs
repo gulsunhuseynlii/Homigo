@@ -2,12 +2,11 @@
 
 namespace Homigo.API.Repositories.Interfaces;
 
-public interface IReviewRepository : IGenericRepository<Review>
+public interface IPaymentRepository : IGenericRepository<Payment>
 {
     Task<Order?> GetCompletedOrderAsync(int orderId, int customerId);
 
-    Task<List<Review>> GetProviderReviewsAsync(int providerId);
-
-    Task<bool> ReviewExistsAsync(int orderId);
     Task<bool> PaymentExistsAsync(int orderId);
+
+    Task<List<Payment>> GetCustomerPaymentsAsync(int customerId);
 }

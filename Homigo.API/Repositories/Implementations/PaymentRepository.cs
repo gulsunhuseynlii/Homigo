@@ -6,12 +6,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Homigo.API.Repositories.Implementations;
 
-public class ReviewRepository
-    : GenericRepository<Review>, IReviewRepository
+public class PaymentRepository
+    : GenericRepository<Payment>, IPaymentRepository
 {
     private readonly AppDbContext _context;
 
-    public ReviewRepository(AppDbContext context)
+    public PaymentRepository(AppDbContext context)
         : base(context)
     {
         _context = context;
@@ -26,25 +26,18 @@ public class ReviewRepository
                 x.Status == OrderStatus.Completed);
     }
 
-    public async Task<List<Review>> GetProviderReviewsAsync(int providerId)
-    {
-        return await _context.Reviews
-            .Include(x => x.Customer)
-            .Where(x => x.ProviderId == providerId)
-            .OrderByDescending(x => x.CreatedAt)
-            .ToListAsync();
-    }
-
-    public async Task<bool> ReviewExistsAsync(int orderId)
-    {
-        return await _context.Reviews
-            .AnyAsync(x => x.OrderId == orderId);
-    }
     public async Task<bool> PaymentExistsAsync(int orderId)
     {
         return await _context.Payments
-            .AnyAsync(x =>
-                x.OrderId == orderId &&
-                x.Status == PaymentStatus.Paid);
+            .AnyAsync(x => x.OrderId == orderId);
+    }
+
+    public async Task<List<Payment>> GetCustomerPaymentsAsync(int customerId)
+    {
+        return await _context.Payments
+            .Include(x => x.Order)
+            .Where(x => x.Order.CustomerId == customerId)
+            .OrderByDescending(x => x.CreatedAt)
+            .ToListAsync();
     }
 }

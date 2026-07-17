@@ -1,14 +1,12 @@
 ﻿using Homigo.API.Enums;
 
-namespace Homigo.API.Entities;
+namespace Homigo.API.DTOs.Payment;
 
-public class Payment
+public class PaymentDto
 {
     public int Id { get; set; }
 
     public int OrderId { get; set; }
-
-    public Order Order { get; set; } = null!;
 
     public decimal Amount { get; set; }
 
@@ -18,5 +16,5 @@ public class Payment
 
     public string TransactionId { get; set; } = string.Empty;
 
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime CreatedAt { get; set; }
 }

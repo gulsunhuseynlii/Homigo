@@ -14,12 +14,17 @@ public class ReviewService : IReviewService
         _reviewRepository = reviewRepository;
     }
 
+
     public async Task CreateAsync(int customerId, CreateReviewDto dto)
     {
         var order = await _reviewRepository.GetCompletedOrderAsync(dto.OrderId, customerId);
 
         if (order == null)
             throw new Exception("Completed order not found.");
+        var paymentExists = await _reviewRepository.PaymentExistsAsync(dto.OrderId);
+
+        if (!paymentExists)
+            throw new Exception("Payment must be completed before adding a review.");
 
         var exists = await _reviewRepository.ReviewExistsAsync(dto.OrderId);
 

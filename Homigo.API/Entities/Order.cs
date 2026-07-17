@@ -26,4 +26,5 @@ public class Order : BaseEntity
 
     public OrderStatus Status { get; set; }
     public Review? Review { get; set; }
+    public Payment? Payment { get; set; }
 }

@@ -1,6 +1,12 @@
-﻿namespace Homigo.API.DTOs.Common
+﻿namespace Homigo.API.DTOs.Common;
+
+public class PagedResponse<T>
 {
-    public class PagedResponse
-    {
-    }
+    public List<T> Items { get; set; } = new();
+
+    public int TotalCount { get; set; }
+
+    public int Page { get; set; }
+
+    public int PageSize { get; set; }
 }
