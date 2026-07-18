@@ -29,6 +29,16 @@ public class AuthController : ControllerBase
 
         return Ok(result);
     }
+    [HttpGet("verify-email")]
+    public async Task<IActionResult> VerifyEmail(string token)
+    {
+        await _authService.VerifyEmailAsync(token);
+
+        return Ok(new
+        {
+            message = "Email verified successfully."
+        });
+    }
 
 
 }

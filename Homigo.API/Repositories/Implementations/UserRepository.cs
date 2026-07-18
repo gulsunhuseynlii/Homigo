@@ -33,4 +33,28 @@ public class UserRepository : GenericRepository<User>, IUserRepository
         return await _context.Roles
             .FirstOrDefaultAsync(x => x.Name == "Customer");
     }
+    public async Task<User?> GetByIdAsync(int id)
+    {
+        return await _context.Users
+            .FirstOrDefaultAsync(x => x.Id == id);
+    }
+
+    public async Task<EmailVerificationToken?> GetVerificationTokenAsync(string token)
+    {
+        return await _context.EmailVerificationTokens
+            .Include(x => x.User)
+            .FirstOrDefaultAsync(x =>
+                x.Token == token &&
+                !x.IsUsed);
+    }
+
+    public async Task AddVerificationTokenAsync(EmailVerificationToken token)
+    {
+        await _context.EmailVerificationTokens.AddAsync(token);
+    }
+
+    public async Task UpdateUserAsync(User user)
+    {
+        _context.Users.Update(user);
+    }
 }

@@ -1,6 +1,8 @@
-﻿namespace Homigo.API.DTOs.Common
+﻿namespace Homigo.API.DTOs.Common;
+
+public class ErrorResponse
 {
-    public class ErrorResponse
-    {
-    }
+    public int StatusCode { get; set; }
+
+    public string Message { get; set; } = string.Empty;
 }

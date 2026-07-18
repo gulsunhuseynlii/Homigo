@@ -23,6 +23,7 @@ public class AppDbContext : DbContext
     public DbSet<Review> Reviews { get; set; }
     public DbSet<Payment> Payments { get; set; }
     public DbSet<Favorite> Favorites { get; set; }
+    public DbSet<EmailVerificationToken> EmailVerificationTokens { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -90,5 +91,10 @@ public class AppDbContext : DbContext
             .HasOne(x => x.Service)
             .WithMany(x => x.Favorites)
             .HasForeignKey(x => x.ServiceId);
+
+        modelBuilder.Entity<EmailVerificationToken>()
+            .HasOne(x => x.User)
+            .WithMany(x => x.EmailVerificationTokens)
+            .HasForeignKey(x => x.UserId);
     }
 }

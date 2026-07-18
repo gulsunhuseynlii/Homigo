@@ -1,7 +1,9 @@
 
+using FluentValidation.AspNetCore;
 using Homigo.API.Configurations;
 using Homigo.API.Data;
 using Homigo.API.Interfaces;
+using Homigo.API.Middlewares;
 using Homigo.API.Repositories.Implementations;
 using Homigo.API.Repositories.Interfaces;
 using Homigo.API.Services;
@@ -33,6 +35,7 @@ namespace Homigo.API
             builder.Services.AddScoped<IDashboardService, DashboardService>();
             builder.Services.AddScoped<IPaymentService, PaymentService>();
             builder.Services.AddScoped<IFavoriteService, FavoriteService>();
+            builder.Services.AddScoped<IEmailService, EmailService>();
 
             builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
@@ -97,6 +100,9 @@ namespace Homigo.API
                 Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
         };
     });
+            builder.Services.AddFluentValidationAutoValidation();
+            builder.Services.Configure<EmailSettings>(
+    builder.Configuration.GetSection("EmailSettings"));
 
             var app = builder.Build();
             using (var scope = app.Services.CreateScope())
@@ -105,7 +111,6 @@ namespace Homigo.API
 
                 DbInitializer.Seed(context);
             }
-            // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
@@ -114,9 +119,10 @@ namespace Homigo.API
 
             app.UseHttpsRedirection();
 
+            app.UseMiddleware<ExceptionMiddleware>();
+
             app.UseAuthentication();
             app.UseAuthorization();
-
 
             app.MapControllers();
 

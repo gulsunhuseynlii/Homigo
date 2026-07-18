@@ -1,6 +1,9 @@
-﻿namespace Homigo.API.Exceptions
+﻿namespace Homigo.API.Exceptions;
+
+public class UnauthorizedException : Exception
 {
-    public class UnauthorizedException
+    public UnauthorizedException(string message)
+        : base(message)
     {
     }
 }

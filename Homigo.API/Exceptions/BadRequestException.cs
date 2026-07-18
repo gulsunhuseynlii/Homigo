@@ -1,6 +1,9 @@
-﻿namespace Homigo.API.Exceptions
+﻿namespace Homigo.API.Exceptions;
+
+public class BadRequestException : Exception
 {
-    public class BadRequestException
+    public BadRequestException(string message)
+        : base(message)
     {
     }
 }

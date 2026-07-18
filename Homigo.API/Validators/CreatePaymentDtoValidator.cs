@@ -1,6 +1,16 @@
-﻿namespace Homigo.API.Validators
+﻿using FluentValidation;
+using Homigo.API.DTOs.Payment;
+
+namespace Homigo.API.Validators;
+
+public class CreatePaymentDtoValidator : AbstractValidator<CreatePaymentDto>
 {
-    public class CreatePaymentDtoValidator
+    public CreatePaymentDtoValidator()
     {
+        RuleFor(x => x.OrderId)
+            .GreaterThan(0);
+
+        RuleFor(x => x.PaymentMethod)
+            .NotEmpty();
     }
 }
