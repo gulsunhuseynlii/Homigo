@@ -32,7 +32,7 @@ namespace Homigo.API
             builder.Services.AddScoped<IReviewService, ReviewService>();
             builder.Services.AddScoped<IDashboardService, DashboardService>();
             builder.Services.AddScoped<IPaymentService, PaymentService>();
-
+            builder.Services.AddScoped<IFavoriteService, FavoriteService>();
 
             builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
@@ -44,6 +44,7 @@ namespace Homigo.API
             builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
             builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
             builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+            builder.Services.AddScoped<IFavoriteRepository, FavoriteRepository>();
 
             builder.Services.AddSwaggerGen(options =>
             {

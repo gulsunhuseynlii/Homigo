@@ -22,6 +22,7 @@ public class AppDbContext : DbContext
     public DbSet<Order> Orders => Set<Order>();
     public DbSet<Review> Reviews { get; set; }
     public DbSet<Payment> Payments { get; set; }
+    public DbSet<Favorite> Favorites { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -74,9 +75,20 @@ public class AppDbContext : DbContext
             .WithMany(x => x.ProviderReviews)
             .HasForeignKey(x => x.ProviderId)
             .OnDelete(DeleteBehavior.NoAction);
+
         modelBuilder.Entity<Payment>()
-    .HasOne(x => x.Order)
-    .WithOne(x => x.Payment)
-    .HasForeignKey<Payment>(x => x.OrderId);
+            .HasOne(x => x.Order)
+            .WithOne(x => x.Payment)
+            .HasForeignKey<Payment>(x => x.OrderId);
+
+        modelBuilder.Entity<Favorite>()
+            .HasOne(x => x.User)
+            .WithMany(x => x.Favorites)
+            .HasForeignKey(x => x.UserId);
+
+        modelBuilder.Entity<Favorite>()
+            .HasOne(x => x.Service)
+            .WithMany(x => x.Favorites)
+            .HasForeignKey(x => x.ServiceId);
     }
 }

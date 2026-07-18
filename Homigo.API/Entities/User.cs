@@ -25,4 +25,5 @@ public class User : BaseEntity
     public ICollection<Review> CustomerReviews { get; set; } = new List<Review>();
 
     public ICollection<Review> ProviderReviews { get; set; } = new List<Review>();
+    public ICollection<Favorite> Favorites { get; set; } = new List<Favorite>();
 }

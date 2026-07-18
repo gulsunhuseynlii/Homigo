@@ -18,4 +18,5 @@ public class Service : BaseEntity
 
     public Category Category { get; set; } = null!;
     public ICollection<Order> Orders { get; set; } = new List<Order>();
+    public ICollection<Favorite> Favorites { get; set; } = new List<Favorite>();
 }
