@@ -4,6 +4,7 @@ using Homigo.API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Homigo.API.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260720143020_AddProviderReviewsRelation")]
+    partial class AddProviderReviewsRelation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -459,21 +462,6 @@ namespace Homigo.API.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("ProviderProfileService", b =>
-                {
-                    b.Property<int>("ProvidersId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ServicesId")
-                        .HasColumnType("int");
-
-                    b.HasKey("ProvidersId", "ServicesId");
-
-                    b.HasIndex("ServicesId");
-
-                    b.ToTable("ProviderProfileService");
-                });
-
             modelBuilder.Entity("Homigo.API.Entities.Address", b =>
                 {
                     b.HasOne("Homigo.API.Entities.User", "User")
@@ -622,21 +610,6 @@ namespace Homigo.API.Migrations
                         .IsRequired();
 
                     b.Navigation("Role");
-                });
-
-            modelBuilder.Entity("ProviderProfileService", b =>
-                {
-                    b.HasOne("Homigo.API.Entities.ProviderProfile", null)
-                        .WithMany()
-                        .HasForeignKey("ProvidersId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Homigo.API.Entities.Service", null)
-                        .WithMany()
-                        .HasForeignKey("ServicesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Homigo.API.Entities.Address", b =>

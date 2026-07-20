@@ -1,5 +1,6 @@
 ﻿using Homigo.API.DTOs.Favorite;
 using Homigo.API.Entities;
+using Homigo.API.Exceptions;
 using Homigo.API.Interfaces;
 using Homigo.API.Repositories.Interfaces;
 using Microsoft.Extensions.Logging;
@@ -34,7 +35,7 @@ public class FavoriteService : IFavoriteService
                 "Service {ServiceId} not found.",
                 serviceId);
 
-            throw new Exception("Service not found.");
+            throw new NotFoundException("Service not found.");
         }
 
         var exists = await _favoriteRepository.ExistsAsync(userId, serviceId);
@@ -46,7 +47,7 @@ public class FavoriteService : IFavoriteService
                 serviceId,
                 userId);
 
-            throw new Exception("Service already exists in favorites.");
+            throw new BadRequestException("Service already exists in favorites.");
         }
 
         var favorite = new Favorite
@@ -79,7 +80,7 @@ public class FavoriteService : IFavoriteService
                 userId,
                 serviceId);
 
-            throw new Exception("Favorite not found.");
+            throw new NotFoundException("Favorite not found.");
         }
 
         await _favoriteRepository.DeleteAsync(favorite);

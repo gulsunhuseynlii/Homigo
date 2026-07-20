@@ -1,6 +1,7 @@
 ﻿using Homigo.API.DTOs.Payment;
 using Homigo.API.Entities;
 using Homigo.API.Enums;
+using Homigo.API.Exceptions;
 using Homigo.API.Interfaces;
 using Homigo.API.Repositories.Interfaces;
 using Microsoft.Extensions.Logging;
@@ -36,7 +37,7 @@ public class PaymentService : IPaymentService
                 dto.OrderId,
                 customerId);
 
-            throw new Exception("Completed order not found.");
+            throw new NotFoundException("Completed order not found.");
         }
 
         var exists = await _paymentRepository.PaymentExistsAsync(dto.OrderId);
@@ -47,7 +48,7 @@ public class PaymentService : IPaymentService
                 "Payment already exists for order {OrderId}.",
                 dto.OrderId);
 
-            throw new Exception("Payment already exists.");
+            throw new BadRequestException("Payment already exists.");
         }
 
         var payment = new Payment

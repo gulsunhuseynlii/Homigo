@@ -1,6 +1,7 @@
 ﻿using Homigo.API.DTOs.Order;
 using Homigo.API.Entities;
 using Homigo.API.Enums;
+using Homigo.API.Exceptions;
 using Homigo.API.Interfaces;
 using Homigo.API.Repositories.Interfaces;
 using Microsoft.Extensions.Logging;
@@ -32,7 +33,7 @@ public class OrderService : IOrderService
         if (service == null)
         {
             _logger.LogWarning("Service {ServiceId} not found.", dto.ServiceId);
-            throw new Exception("Service not found.");
+            throw new NotFoundException("Service not found.");
         }
 
         var address = await _orderRepository.GetAddressAsync(dto.AddressId, userId);
@@ -44,7 +45,7 @@ public class OrderService : IOrderService
                 dto.AddressId,
                 userId);
 
-            throw new Exception("Address not found.");
+            throw new NotFoundException("Address not found.");
         }
 
         var order = new Order
@@ -118,7 +119,7 @@ public class OrderService : IOrderService
                 "Provider profile not found. UserId: {ProviderId}",
                 providerUserId);
 
-            throw new Exception("Provider profile not found.");
+            throw new NotFoundException("Provider profile not found.");
         }
 
         var order = await _orderRepository.GetOrderByIdAsync(orderId);
@@ -126,7 +127,7 @@ public class OrderService : IOrderService
         if (order == null)
         {
             _logger.LogWarning("Order {OrderId} not found.", orderId);
-            throw new Exception("Order not found.");
+            throw new NotFoundException("Order not found.");
         }
 
         if (order.Status != OrderStatus.Pending)
@@ -135,7 +136,7 @@ public class OrderService : IOrderService
                 "Order {OrderId} is not pending.",
                 orderId);
 
-            throw new Exception("Order is not pending.");
+            throw new BadRequestException("Order is not pending.");
         }
 
         order.ProviderId = providerUserId;
@@ -179,10 +180,10 @@ public class OrderService : IOrderService
         var order = await _orderRepository.GetProviderOrderAsync(orderId, providerUserId);
 
         if (order == null)
-            throw new Exception("Order not found.");
+            throw new NotFoundException("Order not found.");
 
         if (order.Status != OrderStatus.Accepted)
-            throw new Exception("Order must be accepted first.");
+            throw new BadRequestException("Order must be accepted first.");
 
         order.Status = OrderStatus.InProgress;
 
@@ -204,10 +205,10 @@ public class OrderService : IOrderService
         var order = await _orderRepository.GetProviderOrderAsync(orderId, providerUserId);
 
         if (order == null)
-            throw new Exception("Order not found.");
+            throw new NotFoundException("Order not found.");
 
         if (order.Status != OrderStatus.InProgress)
-            throw new Exception("Order is not in progress.");
+            throw new BadRequestException("Order is not in progress.");
 
         order.Status = OrderStatus.Completed;
 

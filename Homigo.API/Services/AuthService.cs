@@ -1,6 +1,7 @@
 ﻿using Homigo.API.Configurations;
 using Homigo.API.DTOs.Auth;
 using Homigo.API.Entities;
+using Homigo.API.Exceptions;
 using Homigo.API.Interfaces;
 using Homigo.API.Repositories.Interfaces;
 using Microsoft.Extensions.Logging;
@@ -45,7 +46,7 @@ public class AuthService : IAuthService
                 "Registration failed. Email already exists: {Email}",
                 dto.Email);
 
-            throw new Exception("Email already exists.");
+            throw new BadRequestException("Email already exists.");
         }
 
         var customerRole = await _userRepository.GetCustomerRoleAsync();
@@ -54,7 +55,7 @@ public class AuthService : IAuthService
         {
             _logger.LogError("Customer role not found.");
 
-            throw new Exception("Customer role not found.");
+            throw new NotFoundException("Customer role not found.");
         }
 
         var user = new User
@@ -79,7 +80,7 @@ public class AuthService : IAuthService
         await _userRepository.SaveChangesAsync();
 
         var verifyUrl =
-            $"https://localhost:7024/api/Auth/verify-email?token={verificationToken.Token}";
+            $"https://localhost:7121/api/Auth/verify-email?token={verificationToken.Token}";
 
         await _emailService.SendEmailAsync(
             user.Email,
@@ -93,9 +94,12 @@ public class AuthService : IAuthService
     """);
 
         _logger.LogInformation(
-            "User registered successfully. UserId: {UserId}, Email: {Email}",
-            user.Id,
-            user.Email);
+    "User registered successfully. UserId: {UserId}",
+    user.Id);
+        _logger.LogInformation(
+    "Verification email sent to {Email}",
+    user.Email);
+
     }
 
     public async Task<LoginResponseDto> LoginAsync(LoginDto dto)
@@ -112,7 +116,7 @@ public class AuthService : IAuthService
                 "Login failed. User not found: {Email}",
                 dto.Email);
 
-            throw new Exception("Email or password is incorrect.");
+            throw new UnauthorizedException("Email or password is incorrect.");
         }
 
         bool isPasswordCorrect =
@@ -124,10 +128,10 @@ public class AuthService : IAuthService
                 "Login failed. Wrong password for email: {Email}",
                 dto.Email);
 
-            throw new Exception("Email or password is incorrect.");
+            throw new UnauthorizedException("Email or password is incorrect.");
         }
         if (!user.IsEmailConfirmed)
-            throw new Exception("Please verify your email first.");
+            throw new BadRequestException("Please verify your email first.");
 
         var claims = new List<Claim>
         {
@@ -172,10 +176,10 @@ public class AuthService : IAuthService
             await _userRepository.GetVerificationTokenAsync(token);
 
         if (verification == null)
-            throw new Exception("Invalid verification token.");
+            throw new NotFoundException("Invalid verification token.");
 
         if (verification.ExpireDate < DateTime.UtcNow)
-            throw new Exception("Verification token expired.");
+            throw new BadRequestException("Verification token expired.");
 
         verification.IsUsed = true;
 
@@ -184,5 +188,8 @@ public class AuthService : IAuthService
         await _userRepository.UpdateUserAsync(verification.User);
 
         await _userRepository.SaveChangesAsync();
+        _logger.LogInformation(
+    "Email verified successfully for user {UserId}",
+    verification.UserId);
     }
 }

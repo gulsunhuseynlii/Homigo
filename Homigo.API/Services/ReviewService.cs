@@ -1,5 +1,6 @@
 ﻿using Homigo.API.DTOs.Review;
 using Homigo.API.Entities;
+using Homigo.API.Exceptions;
 using Homigo.API.Interfaces;
 using Homigo.API.Repositories.Interfaces;
 using Microsoft.Extensions.Logging;
@@ -35,7 +36,7 @@ public class ReviewService : IReviewService
                 dto.OrderId,
                 customerId);
 
-            throw new Exception("Completed order not found.");
+            throw new NotFoundException("Completed order not found.");
         }
 
         var paymentExists = await _reviewRepository.PaymentExistsAsync(dto.OrderId);
@@ -46,7 +47,7 @@ public class ReviewService : IReviewService
                 "Review creation failed. Payment not found for order {OrderId}.",
                 dto.OrderId);
 
-            throw new Exception("Payment must be completed before adding a review.");
+            throw new BadRequestException("Payment must be completed before adding a review.");
         }
 
         var exists = await _reviewRepository.ReviewExistsAsync(dto.OrderId);
@@ -57,7 +58,7 @@ public class ReviewService : IReviewService
                 "Review already exists for order {OrderId}.",
                 dto.OrderId);
 
-            throw new Exception("Review already exists for this order.");
+            throw new BadRequestException("Review already exists for this order.");
         }
 
         var review = new Review

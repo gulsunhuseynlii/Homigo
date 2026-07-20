@@ -33,6 +33,9 @@ public class AppDbContext : DbContext
             .HasOne(x => x.User)
             .WithOne(x => x.ProviderProfile)
             .HasForeignKey<ProviderProfile>(x => x.UserId);
+        modelBuilder.Entity<ProviderProfile>()
+    .HasMany(x => x.Services)
+    .WithMany(x => x.Providers);
 
         modelBuilder.Entity<Address>()
             .HasOne(x => x.User)

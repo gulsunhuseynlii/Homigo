@@ -42,4 +42,26 @@ public class ProviderRepository
         return await _context.Roles
             .FirstOrDefaultAsync(x => x.Name == "Provider");
     }
+    public async Task<List<ProviderProfile>> GetAllApprovedAsync()
+    {
+        return await _context.ProviderProfiles
+      .Include(x => x.User)
+      .Include(x => x.Reviews)
+      .Where(x => x.IsApproved)
+      .OrderByDescending(x =>
+          x.Reviews.Any()
+              ? x.Reviews.Average(r => r.Rating)
+              : 0)
+      .ToListAsync();
+    }
+
+    public async Task<ProviderProfile?> GetApprovedByIdAsync(int id)
+    {
+        return await _context.ProviderProfiles
+            .Include(x => x.User)
+            .Include(x => x.Reviews)
+            .FirstOrDefaultAsync(x =>
+                x.Id == id &&
+                x.IsApproved);
+    }
 }

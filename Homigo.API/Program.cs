@@ -3,6 +3,7 @@ using FluentValidation.AspNetCore;
 using Homigo.API.Configurations;
 using Homigo.API.Data;
 using Homigo.API.Interfaces;
+using Homigo.API.Mappings;
 using Homigo.API.Middlewares;
 using Homigo.API.Repositories.Implementations;
 using Homigo.API.Repositories.Interfaces;
@@ -103,6 +104,7 @@ namespace Homigo.API
             builder.Services.AddFluentValidationAutoValidation();
             builder.Services.Configure<EmailSettings>(
     builder.Configuration.GetSection("EmailSettings"));
+            builder.Services.AddAutoMapper(typeof(MappingProfile));
 
             var app = builder.Build();
             using (var scope = app.Services.CreateScope())

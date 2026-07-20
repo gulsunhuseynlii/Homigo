@@ -10,9 +10,12 @@ public class ProviderProfile : BaseEntity
 
     public int YearsOfExperience { get; set; }
 
-    public double AverageRating { get; set; }
-
     public bool IsApproved { get; set; }
 
     public string? ProfileImageUrl { get; set; }
+
+    public ICollection<Review> Reviews { get; set; }
+        = new List<Review>();
+    public ICollection<Service> Services { get; set; }
+       = new List<Service>();
 }

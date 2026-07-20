@@ -49,5 +49,22 @@ public class ProviderController : ControllerBase
             message = "Provider approved successfully."
         });
     }
+    [AllowAnonymous]
+    [HttpGet]
+    public async Task<IActionResult> GetAll()
+    {
+        var result = await _providerService.GetAllAsync();
+
+        return Ok(result);
+    }
+
+    [AllowAnonymous]
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetById(int id)
+    {
+        var result = await _providerService.GetByIdAsync(id);
+
+        return Ok(result);
+    }
 
 }

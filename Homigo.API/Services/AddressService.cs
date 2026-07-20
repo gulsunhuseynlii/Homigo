@@ -1,5 +1,6 @@
 ﻿using Homigo.API.DTOs.Address;
 using Homigo.API.Entities;
+using Homigo.API.Exceptions;
 using Homigo.API.Interfaces;
 using Homigo.API.Repositories.Interfaces;
 
@@ -56,7 +57,7 @@ public class AddressService : IAddressService
         var address = await _addressRepository.GetByIdAndUserAsync(id, userId);
 
         if (address == null)
-            throw new Exception("Address not found.");
+            throw new NotFoundException("Address not found.");
 
         address.Title = dto.Title;
         address.City = dto.City;
@@ -76,7 +77,7 @@ public class AddressService : IAddressService
         var address = await _addressRepository.GetByIdAndUserAsync(id, userId);
 
         if (address == null)
-            throw new Exception("Address not found.");
+            throw new NotFoundException("Address not found.");
 
         address.IsDeleted = true;
 

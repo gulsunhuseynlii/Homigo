@@ -8,4 +8,7 @@ public interface IProviderService
     Task<List<ProviderApplicationDto>> GetPendingApplicationsAsync();
 
     Task ApproveAsync(int userId);
+    Task<List<ProviderDto>> GetAllAsync();
+
+    Task<ProviderDto?> GetByIdAsync(int id);
 }

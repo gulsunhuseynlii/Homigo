@@ -1,6 +1,7 @@
 ﻿using Homigo.API.Data;
 using Homigo.API.DTOs.Service;
 using Homigo.API.Entities;
+using Homigo.API.Exceptions;
 using Homigo.API.Interfaces;
 using Homigo.API.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -56,7 +57,7 @@ public class ServiceService : IServiceService
         var category = await _serviceRepository.GetCategoryByIdAsync(dto.CategoryId);
 
         if (category == null)
-            throw new Exception("Category not found.");
+            throw new NotFoundException("Category not found.");
 
         var service = new Service
         {
@@ -91,12 +92,12 @@ public class ServiceService : IServiceService
         var service = await _serviceRepository.GetEntityByIdAsync(id);
 
         if (service == null)
-            throw new Exception("Service not found.");
+            throw new NotFoundException("Service not found.");
 
         var category = await _serviceRepository.GetCategoryByIdAsync(dto.CategoryId);
 
         if (category == null)
-            throw new Exception("Category not found.");
+            throw new NotFoundException("Category not found.");
 
         service.Name = dto.Name;
         service.Description = dto.Description;
@@ -114,7 +115,7 @@ public class ServiceService : IServiceService
         var service = await _serviceRepository.GetEntityByIdAsync(id);
 
         if (service == null)
-            throw new Exception("Service not found.");
+            throw new NotFoundException("Service not found.");
 
         service.IsDeleted = true;
 

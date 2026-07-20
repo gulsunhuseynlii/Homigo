@@ -11,4 +11,7 @@ public interface IProviderRepository : IGenericRepository<ProviderProfile>
     Task<User?> GetUserWithRoleAsync(int userId);
 
     Task<Role?> GetProviderRoleAsync();
+    Task<List<ProviderProfile>> GetAllApprovedAsync();
+
+    Task<ProviderProfile?> GetApprovedByIdAsync(int id);
 }
