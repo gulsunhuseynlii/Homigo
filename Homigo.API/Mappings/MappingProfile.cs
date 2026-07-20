@@ -24,10 +24,23 @@ public class MappingProfile : Profile
         CreateMap<Address, AddressDto>();
 
         CreateMap<ProviderProfile, ProviderDto>()
+     .ForMember(x => x.FullName,
+         opt => opt.MapFrom(x => x.User.FullName))
+     .ForMember(x => x.Email,
+         opt => opt.MapFrom(x => x.User.Email))
+     .ForMember(x => x.PhoneNumber,
+         opt => opt.MapFrom(x => x.User.PhoneNumber))
+     .ForMember(x => x.Experience,
+         opt => opt.MapFrom(x => $"{x.YearsOfExperience} years"))
+     .ForMember(x => x.AverageRating,
+         opt => opt.MapFrom(x =>
+             x.Reviews.Any()
+                 ? x.Reviews.Average(r => r.Rating)
+                 : 0));
+
+        CreateMap<ProviderProfile, ProviderApplicationDto>()
             .ForMember(x => x.FullName,
-                opt => opt.MapFrom(x => x.User.FullName))
-            .ForMember(x => x.Email,
-                opt => opt.MapFrom(x => x.User.Email));
+                opt => opt.MapFrom(x => x.User.FullName));
 
         CreateMap<Order, OrderDto>()
             .ForMember(x => x.ServiceName,

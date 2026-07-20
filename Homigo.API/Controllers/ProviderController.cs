@@ -66,5 +66,28 @@ public class ProviderController : ControllerBase
 
         return Ok(result);
     }
+    [Authorize(Roles = "Admin")]
+    [HttpPut("{providerId}/services")]
+    public async Task<IActionResult> AssignServices(
+    int providerId,
+    AssignServicesDto dto)
+    {
+        await _providerService.AssignServicesAsync(providerId, dto);
+
+        return Ok(new
+        {
+            message = "Services assigned successfully."
+        });
+    }
+    [AllowAnonymous]
+    [HttpGet("filter")]
+    public async Task<IActionResult> GetAll(
+    [FromQuery] int? serviceId)
+    {
+        var result =
+            await _providerService.GetAllAsync(serviceId);
+
+        return Ok(result);
+    }
 
 }

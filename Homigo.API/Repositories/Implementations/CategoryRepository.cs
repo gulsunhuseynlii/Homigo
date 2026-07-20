@@ -1,5 +1,4 @@
 ﻿using Homigo.API.Data;
-using Homigo.API.DTOs.Category;
 using Homigo.API.Entities;
 using Homigo.API.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -17,16 +16,10 @@ public class CategoryRepository
         _context = context;
     }
 
-    public async Task<List<CategoryDto>> GetAllAsync()
+    public async Task<List<Category>> GetAllAsync()
     {
         return await _context.Categories
             .Where(x => !x.IsDeleted)
-            .Select(x => new CategoryDto
-            {
-                Id = x.Id,
-                Name = x.Name,
-                Icon = x.Icon
-            })
             .ToListAsync();
     }
 }

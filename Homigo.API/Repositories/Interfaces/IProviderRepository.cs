@@ -14,4 +14,6 @@ public interface IProviderRepository : IGenericRepository<ProviderProfile>
     Task<List<ProviderProfile>> GetAllApprovedAsync();
 
     Task<ProviderProfile?> GetApprovedByIdAsync(int id);
+    Task<List<Service>> GetServicesByIdsAsync(List<int> serviceIds);
+    Task<List<ProviderProfile>> GetApprovedProvidersAsync(int? serviceId);
 }

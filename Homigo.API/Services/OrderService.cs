@@ -1,4 +1,5 @@
-﻿using Homigo.API.DTOs.Order;
+﻿using AutoMapper;
+using Homigo.API.DTOs.Order;
 using Homigo.API.Entities;
 using Homigo.API.Enums;
 using Homigo.API.Exceptions;
@@ -12,13 +13,16 @@ public class OrderService : IOrderService
 {
     private readonly IOrderRepository _orderRepository;
     private readonly ILogger<OrderService> _logger;
+    private readonly IMapper _mapper;
 
     public OrderService(
         IOrderRepository orderRepository,
-        ILogger<OrderService> logger)
+        ILogger<OrderService> logger,
+        IMapper mapper)
     {
         _orderRepository = orderRepository;
         _logger = logger;
+        _mapper = mapper;
     }
 
     public async Task CreateAsync(int userId, CreateOrderDto dto)
@@ -74,16 +78,7 @@ public class OrderService : IOrderService
 
         var orders = await _orderRepository.GetCustomerOrdersAsync(userId);
 
-        return orders.Select(x => new OrderDto
-        {
-            Id = x.Id,
-            ServiceName = x.Service.Name,
-            AddressTitle = x.Address.Title,
-            TotalPrice = x.TotalPrice,
-            ScheduledDate = x.ScheduledDate,
-            Status = x.Status.ToString(),
-            ProviderName = x.Provider?.FullName
-        }).ToList();
+        return _mapper.Map<List<OrderDto>>(orders);
     }
 
     public async Task<List<OrderDto>> GetPendingOrdersAsync()
@@ -92,16 +87,7 @@ public class OrderService : IOrderService
 
         var orders = await _orderRepository.GetPendingOrdersAsync();
 
-        return orders.Select(x => new OrderDto
-        {
-            Id = x.Id,
-            ServiceName = x.Service.Name,
-            AddressTitle = x.Address.Title,
-            TotalPrice = x.TotalPrice,
-            ScheduledDate = x.ScheduledDate,
-            Status = x.Status.ToString(),
-            ProviderName = null
-        }).ToList();
+        return _mapper.Map<List<OrderDto>>(orders);
     }
 
     public async Task AcceptOrderAsync(int orderId, int providerUserId)
@@ -158,16 +144,7 @@ public class OrderService : IOrderService
 
         var orders = await _orderRepository.GetProviderOrdersAsync(providerUserId);
 
-        return orders.Select(x => new OrderDto
-        {
-            Id = x.Id,
-            ServiceName = x.Service.Name,
-            AddressTitle = x.Address.Title,
-            TotalPrice = x.TotalPrice,
-            ScheduledDate = x.ScheduledDate,
-            Status = x.Status.ToString(),
-            ProviderName = null
-        }).ToList();
+        return _mapper.Map<List<OrderDto>>(orders);
     }
 
     public async Task StartOrderAsync(int orderId, int providerUserId)

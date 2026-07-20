@@ -4,6 +4,7 @@ using Homigo.API.Entities;
 using Homigo.API.Exceptions;
 using Homigo.API.Interfaces;
 using Homigo.API.Repositories.Interfaces;
+using Microsoft.Extensions.Logging;
 
 namespace Homigo.API.Services;
 
@@ -25,10 +26,17 @@ public class ProviderService : IProviderService
 
     public async Task ApplyAsync(int userId, ApplyProviderDto dto)
     {
+        _logger.LogInformation(
+            "User {UserId} is applying as provider.",
+            userId);
+
         var user = await _providerRepository.GetUserWithRoleAsync(userId);
 
         if (user == null)
+        {
+            _logger.LogWarning("User {UserId} not found.", userId);
             throw new NotFoundException("User not found.");
+        }
 
         if (user.Role.Name == "Admin")
             throw new BadRequestException("Admin cannot apply as provider.");
@@ -51,24 +59,27 @@ public class ProviderService : IProviderService
 
         await _providerRepository.AddAsync(provider);
         await _providerRepository.SaveChangesAsync();
+
+        _logger.LogInformation(
+            "Provider application created successfully. UserId: {UserId}",
+            userId);
     }
 
     public async Task<List<ProviderApplicationDto>> GetPendingApplicationsAsync()
     {
+        _logger.LogInformation("Getting pending provider applications.");
+
         var providers = await _providerRepository.GetPendingAsync();
 
-        return providers.Select(x => new ProviderApplicationDto
-        {
-            UserId = x.UserId,
-            FullName = x.User.FullName,
-            Bio = x.Bio,
-            YearsOfExperience = x.YearsOfExperience,
-            IsApproved = x.IsApproved
-        }).ToList();
+        return _mapper.Map<List<ProviderApplicationDto>>(providers);
     }
 
     public async Task ApproveAsync(int userId)
     {
+        _logger.LogInformation(
+            "Approving provider application for user {UserId}.",
+            userId);
+
         var provider = await _providerRepository.GetByUserIdAsync(userId);
 
         if (provider == null)
@@ -88,30 +99,25 @@ public class ProviderService : IProviderService
         user.RoleId = providerRole.Id;
 
         await _providerRepository.SaveChangesAsync();
+
+        _logger.LogInformation(
+            "Provider approved successfully. UserId: {UserId}",
+            userId);
     }
+
     public async Task<List<ProviderDto>> GetAllAsync()
     {
         _logger.LogInformation("Getting all approved providers.");
 
         var providers = await _providerRepository.GetAllApprovedAsync();
 
-        return providers.Select(x => new ProviderDto
-        {
-            Id = x.Id,
-            FullName = x.User.FullName,
-            Email = x.User.Email,
-            PhoneNumber = x.User.PhoneNumber,
-            Experience = $"{x.YearsOfExperience} years",
-            Bio = x.Bio,
-            AverageRating = x.Reviews.Any()
-                ? x.Reviews.Average(r => r.Rating)
-                : 0
-        }).ToList();
+        return _mapper.Map<List<ProviderDto>>(providers);
     }
+
     public async Task<ProviderDto?> GetByIdAsync(int id)
     {
         _logger.LogInformation(
-            "Getting provider with id {ProviderId}",
+            "Getting provider with id {ProviderId}.",
             id);
 
         var provider = await _providerRepository.GetApprovedByIdAsync(id);
@@ -119,17 +125,48 @@ public class ProviderService : IProviderService
         if (provider == null)
             throw new NotFoundException("Provider not found.");
 
-        return new ProviderDto
+        return _mapper.Map<ProviderDto>(provider);
+    }
+
+    public async Task AssignServicesAsync(int providerId, AssignServicesDto dto)
+    {
+        _logger.LogInformation(
+            "Assigning services to provider {ProviderId}.",
+            providerId);
+
+        var provider = await _providerRepository.GetApprovedByIdAsync(providerId);
+
+        if (provider == null)
+            throw new NotFoundException("Provider not found.");
+
+        var services = await _providerRepository.GetServicesByIdsAsync(dto.ServiceIds);
+
+        if (services.Count != dto.ServiceIds.Count)
+            throw new BadRequestException("One or more services not found.");
+
+        provider.Services.Clear();
+
+        foreach (var service in services)
         {
-            Id = provider.Id,
-            FullName = provider.User.FullName,
-            Email = provider.User.Email,
-            PhoneNumber = provider.User.PhoneNumber,
-            Experience = $"{provider.YearsOfExperience} years",
-            Bio = provider.Bio,
-            AverageRating = provider.Reviews.Any()
-                ? provider.Reviews.Average(r => r.Rating)
-                : 0
-        };
+            provider.Services.Add(service);
+        }
+
+        await _providerRepository.SaveChangesAsync();
+
+        _logger.LogInformation(
+            "Services assigned successfully to provider {ProviderId}.",
+            providerId);
+    }
+
+    public async Task<List<ProviderDto>> GetAllAsync(int? serviceId)
+    {
+        _logger.LogInformation(
+            "Getting approved providers. ServiceId: {ServiceId}",
+            serviceId);
+
+        var providers =
+            await _providerRepository.GetApprovedProvidersAsync(serviceId);
+
+        return _mapper.Map<List<ProviderDto>>(providers);
     }
 }

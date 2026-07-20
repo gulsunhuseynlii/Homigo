@@ -1,4 +1,5 @@
-﻿using Homigo.API.DTOs.Review;
+﻿using AutoMapper;
+using Homigo.API.DTOs.Review;
 using Homigo.API.Entities;
 using Homigo.API.Exceptions;
 using Homigo.API.Interfaces;
@@ -11,13 +12,16 @@ public class ReviewService : IReviewService
 {
     private readonly IReviewRepository _reviewRepository;
     private readonly ILogger<ReviewService> _logger;
+    private readonly IMapper _mapper;
 
     public ReviewService(
         IReviewRepository reviewRepository,
-        ILogger<ReviewService> logger)
+        ILogger<ReviewService> logger,
+        IMapper mapper)
     {
         _reviewRepository = reviewRepository;
         _logger = logger;
+        _mapper = mapper;
     }
 
     public async Task CreateAsync(int customerId, CreateReviewDto dto)
@@ -88,13 +92,6 @@ public class ReviewService : IReviewService
 
         var reviews = await _reviewRepository.GetProviderReviewsAsync(providerId);
 
-        return reviews.Select(x => new ReviewDto
-        {
-            Id = x.Id,
-            CustomerName = x.Customer.FullName,
-            Rating = x.Rating,
-            Comment = x.Comment,
-            CreatedAt = x.CreatedAt
-        }).ToList();
+        return _mapper.Map<List<ReviewDto>>(reviews);
     }
 }

@@ -1,4 +1,5 @@
-﻿using Homigo.API.DTOs.Favorite;
+﻿using AutoMapper;
+using Homigo.API.DTOs.Favorite;
 using Homigo.API.Entities;
 using Homigo.API.Exceptions;
 using Homigo.API.Interfaces;
@@ -11,13 +12,16 @@ public class FavoriteService : IFavoriteService
 {
     private readonly IFavoriteRepository _favoriteRepository;
     private readonly ILogger<FavoriteService> _logger;
+    private readonly IMapper _mapper;
 
     public FavoriteService(
         IFavoriteRepository favoriteRepository,
-        ILogger<FavoriteService> logger)
+        ILogger<FavoriteService> logger,
+        IMapper mapper)
     {
         _favoriteRepository = favoriteRepository;
         _logger = logger;
+        _mapper = mapper;
     }
 
     public async Task AddAsync(int userId, int serviceId)
@@ -100,13 +104,6 @@ public class FavoriteService : IFavoriteService
 
         var favorites = await _favoriteRepository.GetUserFavoritesAsync(userId);
 
-        return favorites.Select(x => new FavoriteDto
-        {
-            Id = x.Id,
-            ServiceId = x.ServiceId,
-            ServiceName = x.Service.Name,
-            BasePrice = x.Service.BasePrice,
-            CategoryName = x.Service.Category.Name
-        }).ToList();
+        return _mapper.Map<List<FavoriteDto>>(favorites);
     }
 }

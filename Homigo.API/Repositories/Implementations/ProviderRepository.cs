@@ -60,8 +60,30 @@ public class ProviderRepository
         return await _context.ProviderProfiles
             .Include(x => x.User)
             .Include(x => x.Reviews)
-            .FirstOrDefaultAsync(x =>
-                x.Id == id &&
-                x.IsApproved);
+            .Include(x => x.Services) // bunu əlavə et
+            .FirstOrDefaultAsync(x => x.Id == id && x.IsApproved);
+    }
+    public async Task<List<Service>> GetServicesByIdsAsync(List<int> serviceIds)
+    {
+        return await _context.Services
+            .Where(x => serviceIds.Contains(x.Id) && !x.IsDeleted)
+            .ToListAsync();
+    }
+    public async Task<List<ProviderProfile>> GetApprovedProvidersAsync(int? serviceId)
+    {
+        var query = _context.ProviderProfiles
+            .Include(x => x.User)
+            .Include(x => x.Reviews)
+            .Include(x => x.Services)
+            .Where(x => x.IsApproved)
+            .AsQueryable();
+
+        if (serviceId.HasValue)
+        {
+            query = query.Where(x =>
+                x.Services.Any(s => s.Id == serviceId.Value));
+        }
+
+        return await query.ToListAsync();
     }
 }

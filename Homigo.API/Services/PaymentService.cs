@@ -1,4 +1,5 @@
-﻿using Homigo.API.DTOs.Payment;
+﻿using AutoMapper;
+using Homigo.API.DTOs.Payment;
 using Homigo.API.Entities;
 using Homigo.API.Enums;
 using Homigo.API.Exceptions;
@@ -12,13 +13,16 @@ public class PaymentService : IPaymentService
 {
     private readonly IPaymentRepository _paymentRepository;
     private readonly ILogger<PaymentService> _logger;
+    private readonly IMapper _mapper;
 
     public PaymentService(
         IPaymentRepository paymentRepository,
-        ILogger<PaymentService> logger)
+        ILogger<PaymentService> logger,
+        IMapper mapper)
     {
         _paymentRepository = paymentRepository;
         _logger = logger;
+        _mapper = mapper;
     }
 
     public async Task<PaymentDto> PayAsync(int customerId, CreatePaymentDto dto)
@@ -69,16 +73,7 @@ public class PaymentService : IPaymentService
             payment.Id,
             payment.OrderId);
 
-        return new PaymentDto
-        {
-            Id = payment.Id,
-            OrderId = payment.OrderId,
-            Amount = payment.Amount,
-            PaymentMethod = payment.PaymentMethod,
-            Status = payment.Status,
-            TransactionId = payment.TransactionId,
-            CreatedAt = payment.CreatedAt
-        };
+        return _mapper.Map<PaymentDto>(payment);
     }
 
     public async Task<List<PaymentDto>> GetMyPaymentsAsync(int customerId)
@@ -89,15 +84,6 @@ public class PaymentService : IPaymentService
 
         var payments = await _paymentRepository.GetCustomerPaymentsAsync(customerId);
 
-        return payments.Select(x => new PaymentDto
-        {
-            Id = x.Id,
-            OrderId = x.OrderId,
-            Amount = x.Amount,
-            PaymentMethod = x.PaymentMethod,
-            Status = x.Status,
-            TransactionId = x.TransactionId,
-            CreatedAt = x.CreatedAt
-        }).ToList();
+        return _mapper.Map<List<PaymentDto>>(payments);
     }
 }
