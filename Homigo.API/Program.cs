@@ -106,6 +106,16 @@ namespace Homigo.API
     builder.Configuration.GetSection("EmailSettings"));
             builder.Services.AddAutoMapper(typeof(MappingProfile));
 
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowReact", policy =>
+                {
+                    policy.WithOrigins("http://localhost:5173")
+                          .AllowAnyHeader()
+                          .AllowAnyMethod();
+                });
+            });
+
             var app = builder.Build();
             using (var scope = app.Services.CreateScope())
             {
@@ -119,8 +129,9 @@ namespace Homigo.API
                 app.UseSwaggerUI();
             }
 
+           
             app.UseHttpsRedirection();
-
+            app.UseCors("AllowReact");
             app.UseMiddleware<ExceptionMiddleware>();
 
             app.UseAuthentication();
