@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { login } from "../services/authService";
+import { saveToken } from "../utils/auth";
 
 function Login() {
   const navigate = useNavigate();
@@ -24,7 +25,8 @@ function Login() {
     try {
       const response = await login(form);
 
-      localStorage.setItem("token", response.data.token);
+      
+      saveToken(response.data.token);
 
       toast.success("Login successful!");
 

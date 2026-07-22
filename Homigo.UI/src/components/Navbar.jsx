@@ -1,30 +1,66 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { isAuthenticated, logout } from "../utils/auth";
 
 function Navbar() {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
+
   return (
-    <nav
-      style={{
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        padding: "20px 40px",
-        backgroundColor: "#2E86DE",
-      }}
-    >
-      <h2 style={{ color: "white" }}>Homigo</h2>
-
-      <div style={{ display: "flex", gap: "20px" }}>
-        <Link to="/" style={{ color: "white", textDecoration: "none" }}>
-          Home
+    <nav className="bg-blue-600 text-white px-8 py-4 shadow-md">
+      <div className="max-w-7xl mx-auto flex items-center justify-between">
+        <Link
+          to="/"
+          className="text-3xl font-bold hover:text-blue-100 transition"
+        >
+          Homigo
         </Link>
 
-        <Link to="/login" style={{ color: "white", textDecoration: "none" }}>
-          Login
-        </Link>
+        <div className="flex items-center gap-6">
+          {isAuthenticated() ? (
+            <>
+              <Link
+                to="/"
+                className="font-semibold hover:text-blue-100 transition"
+              >
+                Home
+              </Link>
 
-        <Link to="/register" style={{ color: "white", textDecoration: "none" }}>
-          Register
-        </Link>
+              <Link
+                to="/services"
+                className="font-semibold hover:text-blue-100 transition"
+              >
+                Services
+              </Link>
+
+              <button
+                onClick={handleLogout}
+                className="bg-white text-blue-600 px-4 py-2 rounded-lg font-semibold hover:bg-gray-100 transition"
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <Link
+                to="/login"
+                className="font-semibold hover:text-blue-100 transition"
+              >
+                Login
+              </Link>
+
+              <Link
+                to="/register"
+                className="font-semibold hover:text-blue-100 transition"
+              >
+                Register
+              </Link>
+            </>
+          )}
+        </div>
       </div>
     </nav>
   );
