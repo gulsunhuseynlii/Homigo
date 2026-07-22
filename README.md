@@ -136,7 +136,7 @@ Review
 Clone the repository
 
 ```bash
-git clone <repository-url>
+git clone <(https://github.com/gulsunhuseynlii/Homigo)>
 ```
 
 Go to the project folder
