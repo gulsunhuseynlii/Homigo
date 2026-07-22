@@ -13,6 +13,10 @@ import Providers from "../pages/Providers";
 import Booking from "../pages/Booking";
 import Addresses from "../pages/Addresses";
 import MyOrders from "../pages/MyOrders";
+import ProviderOrders from "../pages/ProviderOrders";
+import AdminServices from "../pages/AdminServices";
+import AdminDashboard from "../pages/AdminDashboard";
+import AdminCategories from "../pages/AdminCategories";
 
 function AppRoutes() {
   return (
@@ -82,6 +86,38 @@ function AppRoutes() {
             </ProtectedRoute>
           }
         />
+        <Route
+  path="/provider/orders"
+  element={
+    <ProtectedRoute>
+      <ProviderOrders />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/admin/services"
+  element={
+    <ProtectedRoute>
+      <AdminServices />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/admin"
+  element={
+    <ProtectedRoute>
+      <AdminDashboard />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/admin/categories"
+  element={
+    <ProtectedRoute>
+      <AdminCategories />
+    </ProtectedRoute>
+  }
+/>
 
         <Route path="/login" element={<Login />} />
 

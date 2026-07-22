@@ -17,10 +17,10 @@ function Navbar() {
 
   return (
     <nav className="bg-blue-600 text-white px-8 py-4 shadow-md">
-      <div className="max-w-7xl mx-auto flex items-center justify-between">
+      <div className="mx-auto flex max-w-7xl items-center justify-between">
         <Link
           to="/"
-          className="text-3xl font-bold hover:text-blue-100 transition"
+          className="text-3xl font-bold transition hover:text-blue-100"
         >
           Homigo
         </Link>
@@ -30,91 +30,84 @@ function Navbar() {
             <>
               <Link
                 to="/login"
-                className="font-semibold hover:text-blue-100 transition"
+                className="font-semibold transition hover:text-blue-100"
               >
                 Login
               </Link>
 
               <Link
                 to="/register"
-                className="font-semibold hover:text-blue-100 transition"
+                className="font-semibold transition hover:text-blue-100"
               >
                 Register
               </Link>
             </>
           ) : (
             <>
+              {/* Home */}
               <Link
                 to="/"
-                className="font-semibold hover:text-blue-100 transition"
+                className="font-semibold transition hover:text-blue-100"
               >
                 Home
               </Link>
 
-              {role === "Customer" && (
-                <Link
-                  to="/services"
-                  className="font-semibold hover:text-blue-100 transition"
-                >
-                  Services
-                </Link>
-              )}
-
+              {/* Customer */}
               {role === "Customer" && (
                 <>
                   <Link
+                    to="/services"
+                    className="font-semibold transition hover:text-blue-100"
+                  >
+                    Services
+                  </Link>
+
+                  <Link
                     to="/addresses"
-                    className="font-semibold hover:text-blue-100 transition"
+                    className="font-semibold transition hover:text-blue-100"
                   >
                     Addresses
                   </Link>
 
                   <Link
                     to="/my-orders"
-                    className="font-semibold hover:text-blue-100 transition"
+                    className="font-semibold transition hover:text-blue-100"
                   >
                     My Orders
                   </Link>
 
                   <Link
                     to="/favorites"
-                    className="font-semibold hover:text-blue-100 transition"
+                    className="font-semibold transition hover:text-blue-100"
                   >
                     Favorites
                   </Link>
                 </>
               )}
 
+              {/* Provider */}
               {role === "Provider" && (
                 <Link
                   to="/provider/orders"
-                  className="font-semibold hover:text-blue-100 transition"
+                  className="font-semibold transition hover:text-blue-100"
                 >
                   My Jobs
                 </Link>
               )}
 
+              {/* Admin */}
               {role === "Admin" && (
-                <>
-                  <Link
-                    to="/categories"
-                    className="font-semibold hover:text-blue-100 transition"
-                  >
-                    Categories
-                  </Link>
-
-                  <Link
-                    to="/providers"
-                    className="font-semibold hover:text-blue-100 transition"
-                  >
-                    Providers
-                  </Link>
-                </>
+                <Link
+                  to="/admin"
+                  className="font-semibold transition hover:text-blue-100"
+                >
+                  Dashboard
+                </Link>
               )}
 
               <button
                 onClick={handleLogout}
-                className="bg-white text-blue-600 px-4 py-2 rounded-lg font-semibold hover:bg-gray-100 transition"
+                className="rounded-lg bg-white px-4 py-2 font-semibold text-blue-600 transition hover:bg-gray-100"
               >
                 Logout
               </button>
