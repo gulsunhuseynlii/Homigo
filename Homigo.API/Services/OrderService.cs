@@ -28,33 +28,36 @@ public class OrderService : IOrderService
     public async Task CreateAsync(int userId, CreateOrderDto dto)
     {
         _logger.LogInformation(
-            "Customer {UserId} is creating an order for service {ServiceId}",
-            userId,
-            dto.ServiceId);
+            "Customer {UserId} is creating an order.",
+            userId);
 
         var service = await _orderRepository.GetServiceAsync(dto.ServiceId);
 
         if (service == null)
         {
-            _logger.LogWarning("Service {ServiceId} not found.", dto.ServiceId);
             throw new NotFoundException("Service not found.");
         }
 
-        var address = await _orderRepository.GetAddressAsync(dto.AddressId, userId);
+        var address =
+            await _orderRepository.GetAddressAsync(dto.AddressId, userId);
 
         if (address == null)
         {
-            _logger.LogWarning(
-                "Address {AddressId} not found for user {UserId}.",
-                dto.AddressId,
-                userId);
-
             throw new NotFoundException("Address not found.");
+        }
+
+        var provider =
+            await _orderRepository.GetApprovedProviderAsync(dto.ProviderId);
+
+        if (provider == null)
+        {
+            throw new NotFoundException("Provider not found.");
         }
 
         var order = new Order
         {
             CustomerId = userId,
+            ProviderId = dto.ProviderId,
             ServiceId = dto.ServiceId,
             AddressId = dto.AddressId,
             ScheduledDate = dto.ScheduledDate,
@@ -97,35 +100,24 @@ public class OrderService : IOrderService
             providerUserId,
             orderId);
 
-        var provider = await _orderRepository.GetProviderProfileAsync(providerUserId);
+        var provider =
+            await _orderRepository.GetApprovedProviderAsync(providerUserId);
 
         if (provider == null)
-        {
-            _logger.LogWarning(
-                "Provider profile not found. UserId: {ProviderId}",
-                providerUserId);
+            throw new NotFoundException("Provider not found.");
 
-            throw new NotFoundException("Provider profile not found.");
-        }
-
-        var order = await _orderRepository.GetOrderByIdAsync(orderId);
+        var order =
+            await _orderRepository.GetOrderByIdAsync(orderId);
 
         if (order == null)
-        {
-            _logger.LogWarning("Order {OrderId} not found.", orderId);
             throw new NotFoundException("Order not found.");
-        }
+
+        if (order.ProviderId != providerUserId)
+            throw new BadRequestException("This order does not belong to you.");
 
         if (order.Status != OrderStatus.Pending)
-        {
-            _logger.LogWarning(
-                "Order {OrderId} is not pending.",
-                orderId);
-
             throw new BadRequestException("Order is not pending.");
-        }
 
-        order.ProviderId = providerUserId;
         order.Status = OrderStatus.Accepted;
 
         await _orderRepository.UpdateAsync(order);
@@ -154,10 +146,14 @@ public class OrderService : IOrderService
             providerUserId,
             orderId);
 
-        var order = await _orderRepository.GetProviderOrderAsync(orderId, providerUserId);
+        var order =
+            await _orderRepository.GetOrderByIdAsync(orderId);
 
         if (order == null)
             throw new NotFoundException("Order not found.");
+
+        if (order.ProviderId != providerUserId)
+            throw new BadRequestException("This order does not belong to you.");
 
         if (order.Status != OrderStatus.Accepted)
             throw new BadRequestException("Order must be accepted first.");
@@ -168,7 +164,7 @@ public class OrderService : IOrderService
         await _orderRepository.SaveChangesAsync();
 
         _logger.LogInformation(
-            "Order {OrderId} is now in progress.",
+            "Order {OrderId} started successfully.",
             orderId);
     }
 
@@ -179,10 +175,14 @@ public class OrderService : IOrderService
             providerUserId,
             orderId);
 
-        var order = await _orderRepository.GetProviderOrderAsync(orderId, providerUserId);
+        var order =
+            await _orderRepository.GetOrderByIdAsync(orderId);
 
         if (order == null)
             throw new NotFoundException("Order not found.");
+
+        if (order.ProviderId != providerUserId)
+            throw new BadRequestException("This order does not belong to you.");
 
         if (order.Status != OrderStatus.InProgress)
             throw new BadRequestException("Order is not in progress.");

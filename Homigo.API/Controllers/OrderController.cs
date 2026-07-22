@@ -17,7 +17,7 @@ public class OrderController : ControllerBase
     {
         _orderService = orderService;
     }
-
+    [Authorize(Roles = "Customer")]
     [HttpPost]
     public async Task<IActionResult> Create(CreateOrderDto dto)
     {
@@ -30,7 +30,7 @@ public class OrderController : ControllerBase
             message = "Order created successfully."
         });
     }
-
+    [Authorize(Roles = "Customer")]
     [HttpGet("my-orders")]
     public async Task<IActionResult> GetMyOrders()
     {
@@ -40,6 +40,7 @@ public class OrderController : ControllerBase
 
         return Ok(result);
     }
+
     [Authorize(Roles = "Provider")]
     [HttpGet("my-provider-orders")]
     public async Task<IActionResult> GetMyProviderOrders()
