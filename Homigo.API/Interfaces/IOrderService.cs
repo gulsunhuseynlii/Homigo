@@ -8,8 +8,6 @@ public interface IOrderService
 
     Task<List<OrderDto>> GetMyOrdersAsync(int userId);
 
-    Task<List<OrderDto>> GetPendingOrdersAsync();
-
     Task AcceptOrderAsync(int orderId, int providerUserId);
 
     Task<List<OrderDto>> GetMyProviderOrdersAsync(int providerUserId);

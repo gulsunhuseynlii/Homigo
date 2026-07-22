@@ -81,14 +81,6 @@ public class OrderController : ControllerBase
         });
     }
     [Authorize(Roles = "Provider")]
-    [HttpGet("pending")]
-    public async Task<IActionResult> GetPendingOrders()
-    {
-        var result = await _orderService.GetPendingOrdersAsync();
-
-        return Ok(result);
-    }
-    [Authorize(Roles = "Provider")]
     [HttpPut("accept/{id}")]
     public async Task<IActionResult> Accept(int id)
     {

@@ -73,15 +73,4 @@ public class OrderRepository : GenericRepository<Order>, IOrderRepository
                 x.Id == id &&
                 !x.IsDeleted);
     }
-    public async Task<List<Order>> GetPendingOrdersAsync()
-    {
-        return await _context.Orders
-            .Include(x => x.Customer)
-            .Include(x => x.Service)
-            .Include(x => x.Address)
-            .Where(x =>
-                x.Status == OrderStatus.Pending &&
-                !x.IsDeleted)
-            .ToListAsync();
-    }
 }

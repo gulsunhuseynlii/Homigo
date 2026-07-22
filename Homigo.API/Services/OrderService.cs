@@ -84,15 +84,6 @@ public class OrderService : IOrderService
         return _mapper.Map<List<OrderDto>>(orders);
     }
 
-    public async Task<List<OrderDto>> GetPendingOrdersAsync()
-    {
-        _logger.LogInformation("Pending orders requested.");
-
-        var orders = await _orderRepository.GetPendingOrdersAsync();
-
-        return _mapper.Map<List<OrderDto>>(orders);
-    }
-
     public async Task AcceptOrderAsync(int orderId, int providerUserId)
     {
         _logger.LogInformation(
@@ -100,14 +91,7 @@ public class OrderService : IOrderService
             providerUserId,
             orderId);
 
-        var provider =
-            await _orderRepository.GetApprovedProviderAsync(providerUserId);
-
-        if (provider == null)
-            throw new NotFoundException("Provider not found.");
-
-        var order =
-            await _orderRepository.GetOrderByIdAsync(orderId);
+        var order = await _orderRepository.GetOrderByIdAsync(orderId);
 
         if (order == null)
             throw new NotFoundException("Order not found.");
