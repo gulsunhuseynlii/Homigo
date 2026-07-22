@@ -9,11 +9,17 @@ import Login from "../pages/Login";
 import Register from "../pages/Register";
 import Services from "../pages/Services";
 import ServiceDetail from "../pages/ServiceDetail";
+import Providers from "../pages/Providers";
+import Booking from "../pages/Booking";
+import Addresses from "../pages/Addresses";
+import MyOrders from "../pages/MyOrders";
 
 function AppRoutes() {
   return (
     <MainLayout>
+
       <Routes>
+
         <Route
           path="/"
           element={
@@ -41,10 +47,48 @@ function AppRoutes() {
           }
         />
 
+        <Route
+          path="/providers"
+          element={
+            <ProtectedRoute>
+              <Providers />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/booking"
+          element={
+            <ProtectedRoute>
+              <Booking />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/addresses"
+          element={
+            <ProtectedRoute>
+              <Addresses />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/my-orders"
+          element={
+            <ProtectedRoute>
+              <MyOrders />
+            </ProtectedRoute>
+          }
+        />
+
         <Route path="/login" element={<Login />} />
 
         <Route path="/register" element={<Register />} />
+
       </Routes>
+
     </MainLayout>
   );
 }
