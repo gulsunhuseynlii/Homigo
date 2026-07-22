@@ -32,4 +32,23 @@ public class CategoryController : ControllerBase
 
         return CreatedAtAction(nameof(GetAll), new { id = category.Id }, category);
     }
+    [Authorize(Roles = "Admin")]
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Update(
+    int id,
+    UpdateCategoryDto dto)
+    {
+        await _categoryService.UpdateAsync(id, dto);
+
+        return NoContent();
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        await _categoryService.DeleteAsync(id);
+
+        return NoContent();
+    }
 }

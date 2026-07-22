@@ -51,7 +51,9 @@ public class MappingProfile : Profile
                 opt => opt.MapFrom(x =>
                     x.Provider == null ? null : x.Provider.FullName))
             .ForMember(x => x.Status,
-                opt => opt.MapFrom(x => x.Status.ToString()));
+                opt => opt.MapFrom(x => x.Status.ToString()))
+        .ForMember(x => x.CustomerName,
+    opt => opt.MapFrom(x => x.Customer.FullName));
 
         CreateMap<Payment, PaymentDto>();
 

@@ -15,4 +15,5 @@ public class OrderDto
     public string Status { get; set; } = string.Empty;
 
     public string? ProviderName { get; set; }
+    public string CustomerName { get; set; } = string.Empty;
 }

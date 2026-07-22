@@ -22,4 +22,18 @@ public class CategoryRepository
             .Where(x => !x.IsDeleted)
             .ToListAsync();
     }
+    public async Task<Category?> GetByIdAsync(int id)
+    {
+        return await _context.Categories
+            .FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted);
+    }
+
+    public async Task Delete(Category category)
+    {
+        category.IsDeleted = true;
+
+        _context.Categories.Update(category);
+
+        await Task.CompletedTask;
+    }
 }

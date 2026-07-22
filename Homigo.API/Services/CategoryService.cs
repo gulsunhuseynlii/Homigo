@@ -54,4 +54,28 @@ public class CategoryService : ICategoryService
 
         return _mapper.Map<CategoryDto>(category);
     }
+    public async Task UpdateAsync(int id, UpdateCategoryDto dto)
+    {
+        var category = await _categoryRepository.GetByIdAsync(id);
+
+        if (category == null)
+            throw new Exception("Category not found.");
+
+        category.Name = dto.Name;
+        category.Icon = dto.Icon;
+
+        await _categoryRepository.SaveChangesAsync();
+    }
+
+    public async Task DeleteAsync(int id)
+    {
+        var category = await _categoryRepository.GetByIdAsync(id);
+
+        if (category == null)
+            throw new Exception("Category not found.");
+
+        await _categoryRepository.Delete(category);
+
+        await _categoryRepository.SaveChangesAsync();
+    }
 }
