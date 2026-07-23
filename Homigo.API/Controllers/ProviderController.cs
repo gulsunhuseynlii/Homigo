@@ -19,9 +19,10 @@ public class ProviderController : ControllerBase
     }
 
     [HttpPost("apply")]
-    public async Task<IActionResult> Apply(ApplyProviderDto dto)
+    public async Task<IActionResult> Apply([FromForm] ApplyProviderDto dto)
     {
-        var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var userId = int.Parse(
+            User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
         await _providerService.ApplyAsync(userId, dto);
 
@@ -30,6 +31,7 @@ public class ProviderController : ControllerBase
             message = "Your provider application has been submitted successfully."
         });
     }
+
     [Authorize(Roles = "Admin")]
     [HttpGet("pending")]
     public async Task<IActionResult> GetPending()

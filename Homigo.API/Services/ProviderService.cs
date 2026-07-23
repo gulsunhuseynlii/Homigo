@@ -13,15 +13,18 @@ public class ProviderService : IProviderService
     private readonly IProviderRepository _providerRepository;
     private readonly IMapper _mapper;
     private readonly ILogger<ProviderService> _logger;
+    private readonly IFileService _fileService;
 
     public ProviderService(
-        IProviderRepository providerRepository,
-        IMapper mapper,
-        ILogger<ProviderService> logger)
+     IProviderRepository providerRepository,
+     ILogger<ProviderService> logger,
+     IMapper mapper,
+     IFileService fileService)
     {
         _providerRepository = providerRepository;
-        _mapper = mapper;
         _logger = logger;
+        _mapper = mapper;
+        _fileService = fileService;
     }
 
     public async Task ApplyAsync(int userId, ApplyProviderDto dto)
@@ -52,9 +55,49 @@ public class ProviderService : IProviderService
         var provider = new ProviderProfile
         {
             UserId = userId,
+
+            CategoryId = dto.CategoryId,
+
+            PhoneNumber = dto.PhoneNumber,
+
             Bio = dto.Bio,
+
             YearsOfExperience = dto.YearsOfExperience,
-            IsApproved = false
+
+            IsApproved = false,
+
+            ProfileImageUrl = await _fileService.UploadAsync(
+         dto.ProfileImage,
+         "profiles",
+         ".jpg",
+         ".jpeg",
+         ".png",
+         ".webp"),
+
+            IdentityCardUrl = await _fileService.UploadAsync(
+         dto.IdentityCard,
+         "identity",
+         ".jpg",
+         ".jpeg",
+         ".png",
+         ".pdf"),
+
+            CvUrl = await _fileService.UploadAsync(
+         dto.Cv,
+         "cv",
+         ".pdf",
+         ".doc",
+         ".docx"),
+
+            CertificateUrl = dto.Certificate == null
+         ? null
+         : await _fileService.UploadAsync(
+             dto.Certificate,
+             "certificates",
+             ".pdf",
+             ".jpg",
+             ".jpeg",
+             ".png")
         };
 
         await _providerRepository.AddAsync(provider);

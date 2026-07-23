@@ -37,6 +37,7 @@ namespace Homigo.API
             builder.Services.AddScoped<IPaymentService, PaymentService>();
             builder.Services.AddScoped<IFavoriteService, FavoriteService>();
             builder.Services.AddScoped<IEmailService, EmailService>();
+            builder.Services.AddScoped<IFileService, FileService>();
 
             builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
@@ -131,6 +132,7 @@ namespace Homigo.API
 
            
             app.UseHttpsRedirection();
+            app.UseStaticFiles();
             app.UseCors("AllowReact");
             app.UseMiddleware<ExceptionMiddleware>();
 

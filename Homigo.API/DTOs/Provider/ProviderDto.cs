@@ -15,4 +15,6 @@ public class ProviderDto
     public string Bio { get; set; } = string.Empty;
 
     public double AverageRating { get; set; }
+    public string? ProfileImageUrl { get; set; }
+    public string CategoryName { get; set; } = string.Empty;
 }

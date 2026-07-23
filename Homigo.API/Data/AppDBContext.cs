@@ -36,7 +36,11 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<ProviderProfile>()
     .HasMany(x => x.Services)
     .WithMany(x => x.Providers);
-
+        modelBuilder.Entity<ProviderProfile>()
+    .HasOne(x => x.Category)
+    .WithMany()
+    .HasForeignKey(x => x.CategoryId)
+    .OnDelete(DeleteBehavior.NoAction);
         modelBuilder.Entity<Address>()
             .HasOne(x => x.User)
             .WithMany(x => x.Addresses)
@@ -99,5 +103,16 @@ public class AppDbContext : DbContext
             .HasOne(x => x.User)
             .WithMany(x => x.EmailVerificationTokens)
             .HasForeignKey(x => x.UserId);
+        modelBuilder.Entity<Service>()
+    .Property(x => x.BasePrice)
+    .HasPrecision(18, 2);
+
+        modelBuilder.Entity<Order>()
+            .Property(x => x.TotalPrice)
+            .HasPrecision(18, 2);
+
+        modelBuilder.Entity<Payment>()
+            .Property(x => x.Amount)
+            .HasPrecision(18, 2);
     }
 }

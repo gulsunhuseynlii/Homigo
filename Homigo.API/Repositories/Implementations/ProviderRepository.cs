@@ -25,9 +25,10 @@ public class ProviderRepository
     public async Task<List<ProviderProfile>> GetPendingAsync()
     {
         return await _context.ProviderProfiles
-            .Include(x => x.User)
-            .Where(x => !x.IsApproved)
-            .ToListAsync();
+     .Include(x => x.User)
+     .Include(x => x.Category)
+     .Where(x => !x.IsApproved)
+     .ToListAsync();
     }
 
     public async Task<User?> GetUserWithRoleAsync(int userId)
@@ -45,23 +46,25 @@ public class ProviderRepository
     public async Task<List<ProviderProfile>> GetAllApprovedAsync()
     {
         return await _context.ProviderProfiles
-      .Include(x => x.User)
-      .Include(x => x.Reviews)
-      .Where(x => x.IsApproved)
-      .OrderByDescending(x =>
-          x.Reviews.Any()
-              ? x.Reviews.Average(r => r.Rating)
-              : 0)
-      .ToListAsync();
+     .Include(x => x.User)
+     .Include(x => x.Category)
+     .Include(x => x.Reviews)
+     .Where(x => x.IsApproved)
+     .OrderByDescending(x =>
+         x.Reviews.Any()
+             ? x.Reviews.Average(r => r.Rating)
+             : 0)
+     .ToListAsync();
     }
 
     public async Task<ProviderProfile?> GetApprovedByIdAsync(int id)
     {
         return await _context.ProviderProfiles
-            .Include(x => x.User)
-            .Include(x => x.Reviews)
-            .Include(x => x.Services) // bunu əlavə et
-            .FirstOrDefaultAsync(x => x.Id == id && x.IsApproved);
+     .Include(x => x.User)
+     .Include(x => x.Category)
+     .Include(x => x.Reviews)
+     .Include(x => x.Services)
+     .FirstOrDefaultAsync(x => x.Id == id && x.IsApproved);
     }
     public async Task<List<Service>> GetServicesByIdsAsync(List<int> serviceIds)
     {
@@ -72,11 +75,12 @@ public class ProviderRepository
     public async Task<List<ProviderProfile>> GetApprovedProvidersAsync(int? serviceId)
     {
         var query = _context.ProviderProfiles
-            .Include(x => x.User)
-            .Include(x => x.Reviews)
-            .Include(x => x.Services)
-            .Where(x => x.IsApproved)
-            .AsQueryable();
+     .Include(x => x.User)
+     .Include(x => x.Category)
+     .Include(x => x.Reviews)
+     .Include(x => x.Services)
+     .Where(x => x.IsApproved)
+     .AsQueryable();
 
         if (serviceId.HasValue)
         {
