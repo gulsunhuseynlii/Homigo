@@ -112,6 +112,12 @@ function AdminHome() {
             icon={<FaClipboardList className="text-purple-600" />}
             onClick={() => navigate("/admin/orders")}
           />
+          <AdminCard
+  title="Provider Applications"
+  description="Review and approve provider requests."
+  icon={<FaUserCheck className="text-emerald-600" />}
+  onClick={() => navigate("/admin/provider-applications")}
+/>
 
         </div>
       </div>

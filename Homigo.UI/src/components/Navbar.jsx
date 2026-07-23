@@ -16,8 +16,9 @@ function Navbar() {
   };
 
   return (
-    <nav className="bg-blue-600 text-white px-8 py-4 shadow-md">
+    <nav className="bg-blue-600 px-8 py-4 text-white shadow-md">
       <div className="mx-auto flex max-w-7xl items-center justify-between">
+
         <Link
           to="/"
           className="text-3xl font-bold transition hover:text-blue-100"
@@ -26,6 +27,7 @@ function Navbar() {
         </Link>
 
         <div className="flex items-center gap-6">
+
           {!isAuthenticated() ? (
             <>
               <Link
@@ -44,7 +46,9 @@ function Navbar() {
             </>
           ) : (
             <>
+
               {/* Home */}
+
               <Link
                 to="/"
                 className="font-semibold transition hover:text-blue-100"
@@ -53,6 +57,7 @@ function Navbar() {
               </Link>
 
               {/* Customer */}
+
               {role === "Customer" && (
                 <>
                   <Link
@@ -60,6 +65,13 @@ function Navbar() {
                     className="font-semibold transition hover:text-blue-100"
                   >
                     Services
+                  </Link>
+
+                  <Link
+                    to="/become-provider"
+                    className="rounded-lg bg-yellow-400 px-4 py-2 font-semibold text-black transition hover:bg-yellow-300"
+                  >
+                    Become Provider
                   </Link>
 
                   <Link
@@ -86,6 +98,7 @@ function Navbar() {
               )}
 
               {/* Provider */}
+
               {role === "Provider" && (
                 <Link
                   to="/provider/orders"
@@ -96,6 +109,7 @@ function Navbar() {
               )}
 
               {/* Admin */}
+
               {role === "Admin" && (
                 <Link
                   to="/admin"
@@ -111,9 +125,12 @@ function Navbar() {
               >
                 Logout
               </button>
+
             </>
           )}
+
         </div>
+
       </div>
     </nav>
   );

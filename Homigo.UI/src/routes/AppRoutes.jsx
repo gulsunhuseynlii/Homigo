@@ -17,6 +17,9 @@ import ProviderOrders from "../pages/ProviderOrders";
 import AdminServices from "../pages/AdminServices";
 import AdminDashboard from "../pages/AdminDashboard";
 import AdminCategories from "../pages/AdminCategories";
+import BecomeProvider from "../pages/BecomeProvider";
+import AdminProviderApplications from "../pages/AdminProviderApplications";
+
 
 function AppRoutes() {
   return (
@@ -115,6 +118,22 @@ function AppRoutes() {
   element={
     <ProtectedRoute>
       <AdminCategories />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/become-provider"
+  element={
+    <ProtectedRoute>
+      <BecomeProvider />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/admin/provider-applications"
+  element={
+    <ProtectedRoute>
+      <AdminProviderApplications />
     </ProtectedRoute>
   }
 />
