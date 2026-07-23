@@ -1,10 +1,19 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
-import { getCategories } from "../services/adminService";
+import {
+  getCategories,
+  createCategory,
+  updateCategory,
+  deleteCategory,
+} from "../services/adminService";
+
+import CategoryForm from "../components/admin/CategoryForm";
 
 function AdminCategories() {
   const [categories, setCategories] = useState([]);
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState(null);
 
   useEffect(() => {
     loadCategories();
@@ -19,6 +28,51 @@ function AdminCategories() {
     }
   };
 
+  const handleAdd = () => {
+    setSelectedCategory(null);
+    setIsOpen(true);
+  };
+
+  const handleEdit = (category) => {
+    setSelectedCategory(category);
+    setIsOpen(true);
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("Delete this category?")) return;
+
+    try {
+      await deleteCategory(id);
+
+      toast.success("Category deleted.");
+
+      loadCategories();
+    } catch {
+      toast.error("Failed to delete category.");
+    }
+  };
+
+  const handleSubmit = async (formData) => {
+    try {
+      if (selectedCategory) {
+        await updateCategory(selectedCategory.id, formData);
+
+        toast.success("Category updated.");
+      } else {
+        await createCategory(formData);
+
+        toast.success("Category created.");
+      }
+
+      setIsOpen(false);
+      setSelectedCategory(null);
+
+      loadCategories();
+    } catch {
+      toast.error("Operation failed.");
+    }
+  };
+
   return (
     <div className="mx-auto max-w-6xl px-6 py-10">
       <div className="mb-8 flex items-center justify-between">
@@ -27,6 +81,7 @@ function AdminCategories() {
         </h1>
 
         <button
+          onClick={handleAdd}
           className="rounded-xl bg-blue-600 px-5 py-3 font-semibold text-white hover:bg-blue-700"
         >
           + Add Category
@@ -63,11 +118,17 @@ function AdminCategories() {
                 </td>
 
                 <td className="p-4 text-right">
-                  <button className="mr-3 rounded bg-yellow-500 px-4 py-2 text-white">
+                  <button
+                    onClick={() => handleEdit(category)}
+                    className="mr-3 rounded bg-yellow-500 px-4 py-2 text-white hover:bg-yellow-600"
+                  >
                     Edit
                   </button>
 
-                  <button className="rounded bg-red-600 px-4 py-2 text-white">
+                  <button
+                    onClick={() => handleDelete(category.id)}
+                    className="rounded bg-red-600 px-4 py-2 text-white hover:bg-red-700"
+                  >
                     Delete
                   </button>
                 </td>
@@ -76,6 +137,17 @@ function AdminCategories() {
           </tbody>
         </table>
       </div>
+
+      {isOpen && (
+        <CategoryForm
+          initialData={selectedCategory}
+          onSubmit={handleSubmit}
+          onCancel={() => {
+            setIsOpen(false);
+            setSelectedCategory(null);
+          }}
+        />
+      )}
     </div>
   );
 }

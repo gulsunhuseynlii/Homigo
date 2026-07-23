@@ -16,8 +16,20 @@ function CategoryForm({
         name: initialData.name,
         icon: initialData.icon ?? "",
       });
+    } else {
+      setForm({
+        name: "",
+        icon: "",
+      });
     }
   }, [initialData]);
+
+  const handleChange = (e) => {
+    setForm({
+      ...form,
+      [e.target.name]: e.target.value,
+    });
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -25,9 +37,8 @@ function CategoryForm({
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black/40">
-
-      <div className="w-full max-w-md rounded-2xl bg-white p-8">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+      <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-2xl">
 
         <h2 className="mb-6 text-3xl font-bold">
           {initialData ? "Edit Category" : "Add Category"}
@@ -35,56 +46,56 @@ function CategoryForm({
 
         <form
           onSubmit={handleSubmit}
-          className="space-y-4"
+          className="space-y-5"
         >
+          <div>
+            <label className="mb-2 block font-medium">
+              Category Name
+            </label>
 
-          <input
-            placeholder="Name"
-            value={form.name}
-            onChange={(e) =>
-              setForm({
-                ...form,
-                name: e.target.value,
-              })
-            }
-            className="w-full rounded-lg border p-3"
-            required
-          />
+            <input
+              name="name"
+              value={form.name}
+              onChange={handleChange}
+              placeholder="Cleaning"
+              className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-500"
+              required
+            />
+          </div>
 
-          <input
-            placeholder="Icon"
-            value={form.icon}
-            onChange={(e) =>
-              setForm({
-                ...form,
-                icon: e.target.value,
-              })
-            }
-            className="w-full rounded-lg border p-3"
-          />
+          <div>
+            <label className="mb-2 block font-medium">
+              Icon
+            </label>
 
-          <div className="flex justify-end gap-3">
+            <input
+              name="icon"
+              value={form.icon}
+              onChange={handleChange}
+              placeholder="🧹"
+              className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-500"
+            />
+          </div>
 
+          <div className="flex justify-end gap-3 pt-3">
             <button
               type="button"
               onClick={onCancel}
-              className="rounded-lg border px-5 py-2"
+              className="rounded-xl border border-slate-300 px-5 py-3 hover:bg-slate-100"
             >
               Cancel
             </button>
 
             <button
-              className="rounded-lg bg-blue-600 px-5 py-2 text-white"
+              type="submit"
+              className="rounded-xl bg-blue-600 px-5 py-3 font-semibold text-white hover:bg-blue-700"
             >
-              Save
+              {initialData ? "Update" : "Create"}
             </button>
-
           </div>
-
         </form>
 
       </div>
-
     </div>
   );
 }
