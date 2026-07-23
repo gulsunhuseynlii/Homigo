@@ -8,18 +8,17 @@ public class ApplyProviderDtoValidator : AbstractValidator<ApplyProviderDto>
     public ApplyProviderDtoValidator()
     {
         RuleFor(x => x.PhoneNumber)
-            .NotEmpty()
-            .MaximumLength(20);
-
-        RuleFor(x => x.Bio)
-            .NotEmpty()
-            .MaximumLength(500);
-
-        RuleFor(x => x.YearsOfExperience)
-            .GreaterThanOrEqualTo(0);
+              .NotEmpty();
 
         RuleFor(x => x.CategoryId)
             .GreaterThan(0);
+
+        RuleFor(x => x.Bio)
+            .NotEmpty()
+            .MaximumLength(100);
+
+        RuleFor(x => x.YearsOfExperience)
+            .InclusiveBetween(0, 60);
 
         RuleFor(x => x.ProfileImage)
             .NotNull();
