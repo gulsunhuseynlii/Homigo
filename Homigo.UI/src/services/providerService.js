@@ -34,15 +34,6 @@ export const getPendingProviders = async () => {
 };
 
 export const approveProvider = async (userId) => {
-  const response = await api.put(`/Provider/approve/${userId}`);
-  return response.data;
-};
-export const getPendingProviders = async () => {
-  const response = await api.get("/Provider/pending");
-  return response.data;
-};
-
-export const approveProvider = async (userId) => {
   const response = await api.put(
     `/Provider/approve/${userId}`
   );
