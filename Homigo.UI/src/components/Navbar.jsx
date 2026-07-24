@@ -28,23 +28,34 @@ function Navbar() {
 
         <div className="flex items-center gap-6">
 
-          {!isAuthenticated() ? (
-            <>
-              <Link
-                to="/login"
-                className="font-semibold transition hover:text-blue-100"
-              >
-                Login
-              </Link>
+         {!isAuthenticated() ? (
+  <>
+    <Link to="/">Home</Link>
 
-              <Link
-                to="/register"
-                className="font-semibold transition hover:text-blue-100"
-              >
-                Register
-              </Link>
-            </>
-          ) : (
+    <Link to="/categories">
+      Categories
+    </Link>
+
+    <Link to="/services">
+      Services
+    </Link>
+
+    <Link
+      to="/become-provider"
+      className="rounded-lg bg-yellow-400 px-4 py-2 font-semibold text-black hover:bg-yellow-300"
+    >
+      Become Provider
+    </Link>
+
+    <Link to="/login">
+      Login
+    </Link>
+
+    <Link to="/register">
+      Register
+    </Link>
+  </>
+) : (
             <>
 
               {/* Home */}
@@ -99,25 +110,42 @@ function Navbar() {
 
               {/* Provider */}
 
-              {role === "Provider" && (
-                <Link
-                  to="/provider/orders"
-                  className="font-semibold transition hover:text-blue-100"
-                >
-                  My Jobs
-                </Link>
-              )}
+             {role === "Provider" && (
+  <>
+    <Link
+      to="/provider/services"
+      className="font-semibold transition hover:text-blue-100"
+    >
+      My Services
+    </Link>
 
+    <Link
+      to="/provider/orders"
+      className="font-semibold transition hover:text-blue-100"
+    >
+      My Jobs
+    </Link>
+  </>
+)}
               {/* Admin */}
 
-              {role === "Admin" && (
-                <Link
-                  to="/admin"
-                  className="font-semibold transition hover:text-blue-100"
-                >
-                  Dashboard
-                </Link>
-              )}
+          {role === "Admin" && (
+  <>
+    <Link
+      to="/admin"
+      className="font-semibold transition hover:text-blue-100"
+    >
+      Dashboard
+    </Link>
+
+    <Link
+      to="/admin/provider-applications"
+      className="font-semibold transition hover:text-blue-100"
+    >
+      Pending Applications
+    </Link>
+  </>
+)}
 
               <button
                 onClick={handleLogout}

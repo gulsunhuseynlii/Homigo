@@ -99,42 +99,36 @@ function AdminCategories() {
             </tr>
           </thead>
 
-          <tbody>
-            {categories.map((category) => (
-              <tr
-                key={category.id}
-                className="border-t"
-              >
-                <td className="p-4">
-                  {category.id}
-                </td>
+      <tbody>
+  {categories.map((category, index) => (
+    <tr
+      key={category.id}
+      className="border-t"
+    >
+      <td className="p-4">
+        {index + 1}
+      </td>
 
-                <td className="p-4">
-                  {category.name}
-                </td>
+      <td className="p-4">
+        {category.name}
+      </td>
 
-                <td className="p-4">
-                  {category.icon}
-                </td>
+      <td className="p-4">
+        {category.icon}
+      </td>
 
-                <td className="p-4 text-right">
-                  <button
-                    onClick={() => handleEdit(category)}
-                    className="mr-3 rounded bg-yellow-500 px-4 py-2 text-white hover:bg-yellow-600"
-                  >
-                    Edit
-                  </button>
+      <td className="p-4 text-right">
+        <button className="mr-3 rounded bg-yellow-500 px-4 py-2 text-white">
+          Edit
+        </button>
 
-                  <button
-                    onClick={() => handleDelete(category.id)}
-                    className="rounded bg-red-600 px-4 py-2 text-white hover:bg-red-700"
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
+        <button className="rounded bg-red-600 px-4 py-2 text-white">
+          Delete
+        </button>
+      </td>
+    </tr>
+  ))}
+</tbody>
         </table>
       </div>
 

@@ -1,23 +1,17 @@
-import { getRole } from "../utils/auth";
-
-import CustomerHome from "./home/CustomerHome";
-import ProviderHome from "./home/ProviderHome";
-import AdminHome from "./home/AdminHome";
+import Hero from "../components/home/Hero";
+import CategoriesSection from "../components/home/CategoriesSection";
+import ServicesSection from "../components/home/ServicesSection";
+import BecomeProviderSection from "../components/home/BecomeProviderSection";
 
 function Home() {
-  const role = getRole();
-
-  switch (role) {
-    case "Admin":
-      return <AdminHome />;
-
-    case "Provider":
-      return <ProviderHome />;
-
-    case "Customer":
-    default:
-      return <CustomerHome />;
-  }
+  return (
+    <>
+      <Hero />
+      <CategoriesSection />
+      <ServicesSection />
+      <BecomeProviderSection />
+    </>
+  );
 }
 
 export default Home;

@@ -91,16 +91,6 @@ function AdminServices() {
         <h1 className="text-4xl font-bold">
           Services
         </h1>
-
-        <button
-          onClick={() => {
-            setSelectedService(null);
-            setIsOpen(true);
-          }}
-          className="rounded-xl bg-blue-600 px-5 py-3 font-semibold text-white hover:bg-blue-700"
-        >
-          + Add Service
-        </button>
       </div>
 
       {services.length === 0 ? (
@@ -111,9 +101,10 @@ function AdminServices() {
         </div>
       ) : (
         <div className="grid gap-6 md:grid-cols-2">
-          {services.map((service) => (
+          {services.map((service, index) => (
             <ServiceCard
               key={service.id}
+              index={index}
               service={service}
               onEdit={(service) => {
                 setSelectedService(service);

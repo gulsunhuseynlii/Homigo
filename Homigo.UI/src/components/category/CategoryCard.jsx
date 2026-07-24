@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import {
   FaBroom,
   FaBolt,
@@ -8,7 +9,9 @@ import {
   FaHouse,
 } from "react-icons/fa6";
 
-function CategoryCard({ category, onClick }) {
+function CategoryCard({ category }) {
+  const navigate = useNavigate();
+
   const getIcon = (name) => {
     switch (name.toLowerCase()) {
       case "cleaning":
@@ -36,7 +39,7 @@ function CategoryCard({ category, onClick }) {
 
   return (
     <div
-      onClick={onClick}
+      onClick={() => navigate(`/services?categoryId=${category.id}`)}
       className="group cursor-pointer rounded-3xl border border-slate-200 bg-white p-8 shadow-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-xl"
     >
       <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-100 text-blue-600">
@@ -53,7 +56,6 @@ function CategoryCard({ category, onClick }) {
 
       <div className="mt-6 flex items-center font-semibold text-blue-600">
         Explore
-
         <span className="ml-2 transition-transform duration-300 group-hover:translate-x-2">
           →
         </span>

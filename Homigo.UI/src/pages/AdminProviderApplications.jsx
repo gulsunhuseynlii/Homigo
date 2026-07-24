@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 import {
   getPendingProviders,
   approveProvider,
+  rejectProvider,
 } from "../services/providerService";
 
 function AdminProviderApplications() {
@@ -38,7 +39,22 @@ function AdminProviderApplications() {
       );
     }
   };
+const handleReject = async (userId) => {
+  if (!window.confirm("Reject this provider application?")) return;
 
+  try {
+    await rejectProvider(userId);
+
+    toast.success("Provider application rejected.");
+
+    loadApplications();
+  } catch (err) {
+    toast.error(
+      err.response?.data?.message ??
+      "Failed to reject provider."
+    );
+  }
+};
   return (
     <div className="mx-auto max-w-7xl px-6 py-10">
 
@@ -145,18 +161,23 @@ function AdminProviderApplications() {
 
               </div>
 
-              <div className="mt-8 flex justify-end">
+            <div className="mt-8 flex justify-end gap-3">
 
-                <button
-                  onClick={() =>
-                    handleApprove(application.userId)
-                  }
-                  className="rounded-xl bg-emerald-600 px-6 py-3 font-semibold text-white hover:bg-emerald-700"
-                >
-                  Approve Provider
-                </button>
+  <button
+    onClick={() => handleApprove(application.userId)}
+    className="rounded-xl bg-emerald-600 px-6 py-3 font-semibold text-white hover:bg-emerald-700"
+  >
+    Approve Provider
+  </button>
 
-              </div>
+  <button
+    onClick={() => handleReject(application.userId)}
+    className="rounded-xl bg-red-600 px-6 py-3 font-semibold text-white hover:bg-red-700"
+  >
+    Reject
+  </button>
+
+</div>
 
             </div>
 

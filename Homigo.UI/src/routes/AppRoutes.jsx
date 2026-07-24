@@ -19,54 +19,38 @@ import AdminDashboard from "../pages/AdminDashboard";
 import AdminCategories from "../pages/AdminCategories";
 import BecomeProvider from "../pages/BecomeProvider";
 import AdminProviderApplications from "../pages/AdminProviderApplications";
-
+import Categories from "../pages/Categories";
+import ProviderServices from "../pages/ProviderServices";
+import CreateService from "../pages/CreateService";
+import EditService from "../pages/EditService";
+import AdminProviders from "../pages/AdminProviders";
 
 function AppRoutes() {
   return (
     <MainLayout>
-
       <Routes>
 
-        <Route
-          path="/"
-          element={
-            <ProtectedRoute>
-              <Home />
-            </ProtectedRoute>
-          }
-        />
+        {/* ---------- Public ---------- */}
 
-        <Route
-          path="/services"
-          element={
-            <ProtectedRoute>
-              <Services />
-            </ProtectedRoute>
-          }
-        />
+       <Route path="/" element={<Home />} />
 
-        <Route
-          path="/services/:id"
-          element={
-            <ProtectedRoute>
-              <ServiceDetail />
-            </ProtectedRoute>
-          }
-        />
+<Route path="/categories" element={<Categories />} />
 
-        <Route
-          path="/providers"
-          element={
-            <ProtectedRoute>
-              <Providers />
-            </ProtectedRoute>
-          }
-        />
+<Route path="/services" element={<Services />} />
+
+<Route path="/services/:id" element={<ServiceDetail />} />
+
+<Route path="/providers" element={<Providers />} />
+
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+
+        {/* ---------- Customer ---------- */}
 
         <Route
           path="/booking"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute roles={["Customer"]}>
               <Booking />
             </ProtectedRoute>
           }
@@ -75,7 +59,7 @@ function AppRoutes() {
         <Route
           path="/addresses"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute roles={["Customer"]}>
               <Addresses />
             </ProtectedRoute>
           }
@@ -84,66 +68,114 @@ function AppRoutes() {
         <Route
           path="/my-orders"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute roles={["Customer"]}>
               <MyOrders />
             </ProtectedRoute>
           }
         />
+
         <Route
+          path="/become-provider"
+          element={
+            <ProtectedRoute roles={["Customer"]}>
+              <BecomeProvider />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* ---------- Provider ---------- */}
+
+        <Route
+          path="/provider/orders"
+          element={
+            <ProtectedRoute roles={["Provider"]}>
+              <ProviderOrders />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* ---------- Admin ---------- */}
+
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute roles={["Admin"]}>
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/categories"
+          element={
+            <ProtectedRoute roles={["Admin"]}>
+              <AdminCategories />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/services"
+          element={
+            <ProtectedRoute roles={["Admin"]}>
+              <AdminServices />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/provider-applications"
+          element={
+            <ProtectedRoute roles={["Admin"]}>
+              <AdminProviderApplications />
+            </ProtectedRoute>
+          }
+        />
+          <Route
+  path="/provider/services"
+  element={
+    <ProtectedRoute roles={["Provider"]}>
+      <ProviderServices />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/provider/services/create"
+  element={
+    <ProtectedRoute roles={["Provider"]}>
+      <CreateService />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/provider/services/edit/:id"
+  element={
+    <ProtectedRoute roles={["Provider"]}>
+      <EditService />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
   path="/provider/orders"
   element={
-    <ProtectedRoute>
+    <ProtectedRoute roles={["Provider"]}>
       <ProviderOrders />
     </ProtectedRoute>
   }
+  
 />
 <Route
-  path="/admin/services"
+  path="/admin/providers"
   element={
     <ProtectedRoute>
-      <AdminServices />
+      <AdminProviders />
     </ProtectedRoute>
   }
 />
-<Route
-  path="/admin"
-  element={
-    <ProtectedRoute>
-      <AdminDashboard />
-    </ProtectedRoute>
-  }
-/>
-<Route
-  path="/admin/categories"
-  element={
-    <ProtectedRoute>
-      <AdminCategories />
-    </ProtectedRoute>
-  }
-/>
-<Route
-  path="/become-provider"
-  element={
-    <ProtectedRoute>
-      <BecomeProvider />
-    </ProtectedRoute>
-  }
-/>
-<Route
-  path="/admin/provider-applications"
-  element={
-    <ProtectedRoute>
-      <AdminProviderApplications />
-    </ProtectedRoute>
-  }
-/>
-
-        <Route path="/login" element={<Login />} />
-
-        <Route path="/register" element={<Register />} />
-
       </Routes>
-
     </MainLayout>
   );
 }

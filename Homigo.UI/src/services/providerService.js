@@ -40,3 +40,6 @@ export const approveProvider = async (userId) => {
 
   return response.data;
 };
+export const rejectProvider = async (userId) => {
+  await api.put(`/Provider/reject/${userId}`);
+};
