@@ -13,4 +13,5 @@ public interface IServiceService
     Task UpdateAsync(int userId, int serviceId, UpdateServiceDto dto);
 
     Task DeleteAsync(int userId, int serviceId);
+    Task<List<ServiceDto>> GetMyServicesAsync(int userId);
 }

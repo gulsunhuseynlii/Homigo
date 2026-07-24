@@ -13,4 +13,5 @@ public interface IProviderService
     Task<ProviderDto?> GetByIdAsync(int id);
     Task AssignServicesAsync(int providerId, AssignServicesDto dto);
     Task<List<ProviderDto>> GetAllAsync(int? serviceId);
+    Task RejectAsync(int userId);
 }

@@ -8,4 +8,6 @@ public interface IFileService
         IFormFile file,
         string folder,
         params string[] allowedExtensions);
+
+    void Delete(string filePath);
 }

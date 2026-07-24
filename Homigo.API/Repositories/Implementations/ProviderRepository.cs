@@ -25,10 +25,10 @@ public class ProviderRepository
     public async Task<List<ProviderProfile>> GetPendingAsync()
     {
         return await _context.ProviderProfiles
-     .Include(x => x.User)
-     .Include(x => x.Category)
-     .Where(x => !x.IsApproved)
-     .ToListAsync();
+            .Include(x => x.User)
+            .Include(x => x.Category)
+            .Where(x => !x.IsApproved && !x.IsDeleted)
+            .ToListAsync();
     }
 
     public async Task<User?> GetUserWithRoleAsync(int userId)
@@ -49,7 +49,7 @@ public class ProviderRepository
      .Include(x => x.User)
      .Include(x => x.Category)
      .Include(x => x.Reviews)
-     .Where(x => x.IsApproved)
+     .Where(x => x.IsApproved && !x.IsDeleted)
      .OrderByDescending(x =>
          x.Reviews.Any()
              ? x.Reviews.Average(r => r.Rating)
@@ -64,7 +64,7 @@ public class ProviderRepository
      .Include(x => x.Category)
      .Include(x => x.Reviews)
      .Include(x => x.Services)
-     .FirstOrDefaultAsync(x => x.Id == id && x.IsApproved);
+     .FirstOrDefaultAsync(x => x.Id == id && x.IsApproved && !x.IsDeleted);
     }
     public async Task<List<Service>> GetServicesByIdsAsync(List<int> serviceIds)
     {
@@ -79,7 +79,7 @@ public class ProviderRepository
      .Include(x => x.Category)
      .Include(x => x.Reviews)
      .Include(x => x.Services)
-     .Where(x => x.IsApproved)
+     .Where(x => x.IsApproved && !x.IsDeleted)
      .AsQueryable();
 
         if (serviceId.HasValue)

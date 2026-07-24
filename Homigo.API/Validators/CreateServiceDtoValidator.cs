@@ -19,6 +19,6 @@ public class CreateServiceDtoValidator : AbstractValidator<CreateServiceDto>
 
         RuleFor(x => x.EstimatedMinutes)
             .GreaterThan(0);
-
+    
     }
 }

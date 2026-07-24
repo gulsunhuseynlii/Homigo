@@ -38,7 +38,7 @@ public class ServiceController : ControllerBase
 
     [Authorize(Roles = "Admin,Provider")]
     [HttpPost]
-    public async Task<IActionResult> Create(CreateServiceDto dto)
+    public async Task<IActionResult> Create([FromForm] CreateServiceDto dto)
     {
         var userId = int.Parse(
             User.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -55,7 +55,7 @@ public class ServiceController : ControllerBase
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(
         int id,
-        UpdateServiceDto dto)
+        [FromForm] UpdateServiceDto dto)
     {
         var userId = int.Parse(
             User.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -80,5 +80,17 @@ public class ServiceController : ControllerBase
             id);
 
         return NoContent();
+    }
+    [Authorize(Roles = "Provider")]
+    [HttpGet("my")]
+    public async Task<IActionResult> GetMyServices()
+    {
+        var userId = int.Parse(
+            User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+        var services =
+            await _serviceService.GetMyServicesAsync(userId);
+
+        return Ok(services);
     }
 }

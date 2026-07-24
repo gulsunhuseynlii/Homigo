@@ -13,15 +13,18 @@ public class ServiceService : IServiceService
     private readonly IServiceRepository _serviceRepository;
     private readonly ILogger<ServiceService> _logger;
     private readonly IMapper _mapper;
+    private readonly IFileService _fileService;
 
     public ServiceService(
         IServiceRepository serviceRepository,
         ILogger<ServiceService> logger,
-        IMapper mapper)
+        IMapper mapper,
+        IFileService fileService)
     {
         _serviceRepository = serviceRepository;
         _logger = logger;
         _mapper = mapper;
+        _fileService = fileService;
     }
 
     public async Task<List<ServiceDto>> GetAllAsync(ServiceQueryDto query)
@@ -67,7 +70,9 @@ public class ServiceService : IServiceService
             Description = dto.Description,
             BasePrice = dto.BasePrice,
             EstimatedMinutes = dto.EstimatedMinutes,
-            ImageUrl = dto.ImageUrl,
+            ImageUrl = dto.Image != null
+    ? await _fileService.UploadAsync(dto.Image, "services")
+    : null,
             ProviderId = provider.Id,
             IsActive = true
         };
@@ -94,7 +99,7 @@ public class ServiceService : IServiceService
             userId);
 
         var provider =
-         await _serviceRepository.GetProviderByUserIdAsync(userId);
+            await _serviceRepository.GetProviderByUserIdAsync(userId);
 
         Service? service;
 
@@ -118,7 +123,17 @@ public class ServiceService : IServiceService
         service.Description = dto.Description;
         service.BasePrice = dto.BasePrice;
         service.EstimatedMinutes = dto.EstimatedMinutes;
-        service.ImageUrl = dto.ImageUrl;
+
+        if (dto.Image != null)
+        {
+            if (!string.IsNullOrWhiteSpace(service.ImageUrl))
+            {
+                _fileService.Delete(service.ImageUrl);
+            }
+
+            service.ImageUrl =
+                await _fileService.UploadAsync(dto.Image, "services");
+        }
 
         await _serviceRepository.UpdateAsync(service);
         await _serviceRepository.SaveChangesAsync();
@@ -167,5 +182,18 @@ public class ServiceService : IServiceService
         _logger.LogInformation(
             "Service {ServiceId} deleted successfully.",
             serviceId);
+    }
+    public async Task<List<ServiceDto>> GetMyServicesAsync(int userId)
+    {
+        var provider =
+            await _serviceRepository.GetProviderByUserIdAsync(userId);
+
+        if (provider == null)
+            throw new NotFoundException("Provider not found.");
+
+        var services =
+            await _serviceRepository.GetProviderServicesAsync(provider.Id);
+
+        return _mapper.Map<List<ServiceDto>>(services);
     }
 }

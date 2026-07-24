@@ -9,4 +9,5 @@ public interface IPaymentRepository : IGenericRepository<Payment>
     Task<bool> PaymentExistsAsync(int orderId);
 
     Task<List<Payment>> GetCustomerPaymentsAsync(int customerId);
+
 }

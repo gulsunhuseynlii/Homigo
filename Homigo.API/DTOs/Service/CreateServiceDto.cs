@@ -1,4 +1,4 @@
-﻿namespace Homigo.API.DTOs.Service;
+﻿using Microsoft.AspNetCore.Http;
 
 public class CreateServiceDto
 {
@@ -10,5 +10,5 @@ public class CreateServiceDto
 
     public int EstimatedMinutes { get; set; }
 
-    public string? ImageUrl { get; set; }
+    public IFormFile? Image { get; set; }
 }

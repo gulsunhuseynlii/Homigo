@@ -91,5 +91,12 @@ public class ProviderController : ControllerBase
 
         return Ok(result);
     }
+    [Authorize(Roles = "Admin")]
+    [HttpPut("reject/{userId}")]
+    public async Task<IActionResult> Reject(int userId)
+    {
+        await _providerService.RejectAsync(userId);
 
+        return NoContent();
+    }
 }

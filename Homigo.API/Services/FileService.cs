@@ -67,4 +67,21 @@ public class FileService : IFileService
 
         return $"/uploads/{folder}/{fileName}";
     }
+    public void Delete(string filePath)
+    {
+        if (string.IsNullOrWhiteSpace(filePath))
+            return;
+
+        var relativePath = filePath.TrimStart('/');
+
+        var fullPath = Path.Combine(
+            Directory.GetCurrentDirectory(),
+            "wwwroot",
+            relativePath.Replace('/', Path.DirectorySeparatorChar));
+
+        if (File.Exists(fullPath))
+        {
+            File.Delete(fullPath);
+        }
+    }
 }

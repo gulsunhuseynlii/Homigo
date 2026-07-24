@@ -47,57 +47,108 @@ public class ProviderService : IProviderService
         if (user.Role.Name == "Provider")
             throw new BadRequestException("You are already a provider.");
 
-        var exists = await _providerRepository.GetByUserIdAsync(userId);
+        var provider = await _providerRepository.GetByUserIdAsync(userId);
 
-        if (exists != null)
-            throw new BadRequestException("You have already applied.");
+        if (provider != null)
+        {
+            if (!provider.IsDeleted)
+                throw new BadRequestException("You have already applied.");
 
-        var provider = new ProviderProfile
+            // Reject olunmuş müraciəti yenidən aktiv edirik
+            provider.IsDeleted = false;
+            provider.IsApproved = false;
+
+            provider.CategoryId = dto.CategoryId;
+            provider.PhoneNumber = dto.PhoneNumber;
+            provider.Bio = dto.Bio;
+            provider.YearsOfExperience = dto.YearsOfExperience;
+
+            provider.ProfileImageUrl = await _fileService.UploadAsync(
+                dto.ProfileImage,
+                "profiles",
+                ".jpg",
+                ".jpeg",
+                ".png",
+                ".webp");
+
+            provider.IdentityCardUrl = await _fileService.UploadAsync(
+                dto.IdentityCard,
+                "identity",
+                ".jpg",
+                ".jpeg",
+                ".png",
+                ".pdf");
+
+            provider.CvUrl = await _fileService.UploadAsync(
+                dto.Cv,
+                "cv",
+                ".pdf",
+                ".doc",
+                ".docx");
+
+            provider.CertificateUrl = dto.Certificate == null
+                ? null
+                : await _fileService.UploadAsync(
+                    dto.Certificate,
+                    "certificates",
+                    ".pdf",
+                    ".jpg",
+                    ".jpeg",
+                    ".png");
+
+            await _providerRepository.UpdateAsync(provider);
+            await _providerRepository.SaveChangesAsync();
+
+            _logger.LogInformation(
+                "Rejected provider application submitted again. UserId: {UserId}",
+                userId);
+
+            return;
+        }
+
+        // İlk dəfə müraciət edirsə
+        provider = new ProviderProfile
         {
             UserId = userId,
-
             CategoryId = dto.CategoryId,
-
             PhoneNumber = dto.PhoneNumber,
-
             Bio = dto.Bio,
-
             YearsOfExperience = dto.YearsOfExperience,
-
             IsApproved = false,
+            IsDeleted = false,
 
             ProfileImageUrl = await _fileService.UploadAsync(
-         dto.ProfileImage,
-         "profiles",
-         ".jpg",
-         ".jpeg",
-         ".png",
-         ".webp"),
+                dto.ProfileImage,
+                "profiles",
+                ".jpg",
+                ".jpeg",
+                ".png",
+                ".webp"),
 
             IdentityCardUrl = await _fileService.UploadAsync(
-         dto.IdentityCard,
-         "identity",
-         ".jpg",
-         ".jpeg",
-         ".png",
-         ".pdf"),
+                dto.IdentityCard,
+                "identity",
+                ".jpg",
+                ".jpeg",
+                ".png",
+                ".pdf"),
 
             CvUrl = await _fileService.UploadAsync(
-         dto.Cv,
-         "cv",
-         ".pdf",
-         ".doc",
-         ".docx"),
+                dto.Cv,
+                "cv",
+                ".pdf",
+                ".doc",
+                ".docx"),
 
             CertificateUrl = dto.Certificate == null
-         ? null
-         : await _fileService.UploadAsync(
-             dto.Certificate,
-             "certificates",
-             ".pdf",
-             ".jpg",
-             ".jpeg",
-             ".png")
+                ? null
+                : await _fileService.UploadAsync(
+                    dto.Certificate,
+                    "certificates",
+                    ".pdf",
+                    ".jpg",
+                    ".jpeg",
+                    ".png")
         };
 
         await _providerRepository.AddAsync(provider);
@@ -211,5 +262,25 @@ public class ProviderService : IProviderService
             await _providerRepository.GetApprovedProvidersAsync(serviceId);
 
         return _mapper.Map<List<ProviderDto>>(providers);
+    }
+    public async Task RejectAsync(int userId)
+    {
+        _logger.LogInformation(
+            "Rejecting provider application for user {UserId}.",
+            userId);
+
+        var provider =
+            await _providerRepository.GetByUserIdAsync(userId);
+
+        if (provider == null)
+            throw new NotFoundException("Provider application not found.");
+
+        provider.IsDeleted = true;
+
+        await _providerRepository.UpdateAsync(provider);
+        await _providerRepository.SaveChangesAsync();
+
+        _logger.LogInformation(
+            "Provider application rejected successfully.");
     }
 }
