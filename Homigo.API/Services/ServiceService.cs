@@ -26,7 +26,7 @@ public class ServiceService : IServiceService
 
     public async Task<List<ServiceDto>> GetAllAsync(ServiceQueryDto query)
     {
-        _logger.LogInformation("Services requested.");
+        _logger.LogInformation("Getting services.");
 
         var services = await _serviceRepository.GetAllAsync(query);
 
@@ -36,39 +36,30 @@ public class ServiceService : IServiceService
     public async Task<ServiceDto?> GetByIdAsync(int id)
     {
         _logger.LogInformation(
-            "Service {ServiceId} requested.",
+            "Getting service {ServiceId}.",
             id);
 
-        var service = await _serviceRepository.GetByIdWithCategoryAsync(id);
+        var service = await _serviceRepository.GetByIdAsync(id);
 
         if (service == null)
-        {
-            _logger.LogWarning(
-                "Service {ServiceId} not found.",
-                id);
-
-            return null;
-        }
+            throw new NotFoundException("Service not found.");
 
         return _mapper.Map<ServiceDto>(service);
     }
 
-    public async Task<ServiceDto> CreateAsync(CreateServiceDto dto)
+    public async Task<ServiceDto> CreateAsync(
+        int userId,
+        CreateServiceDto dto)
     {
         _logger.LogInformation(
-            "Creating service {ServiceName}.",
-            dto.Name);
+            "Creating service for user {UserId}.",
+            userId);
 
-        var category = await _serviceRepository.GetCategoryByIdAsync(dto.CategoryId);
+        var provider =
+            await _serviceRepository.GetProviderByUserIdAsync(userId);
 
-        if (category == null)
-        {
-            _logger.LogWarning(
-                "Category {CategoryId} not found.",
-                dto.CategoryId);
-
-            throw new NotFoundException("Category not found.");
-        }
+        if (provider == null)
+            throw new NotFoundException("Provider not found.");
 
         var service = new Service
         {
@@ -77,81 +68,96 @@ public class ServiceService : IServiceService
             BasePrice = dto.BasePrice,
             EstimatedMinutes = dto.EstimatedMinutes,
             ImageUrl = dto.ImageUrl,
-            CategoryId = dto.CategoryId,
+            ProviderId = provider.Id,
             IsActive = true
         };
 
         await _serviceRepository.AddAsync(service);
         await _serviceRepository.SaveChangesAsync();
 
-        service.Category = category;
+        service.Provider = provider;
 
         _logger.LogInformation(
-            "Service {ServiceId} created successfully.",
+            "Service created successfully. Id: {ServiceId}",
             service.Id);
 
         return _mapper.Map<ServiceDto>(service);
     }
-
-    public async Task UpdateAsync(int id, UpdateServiceDto dto)
+    public async Task UpdateAsync(
+    int userId,
+    int serviceId,
+    UpdateServiceDto dto)
     {
         _logger.LogInformation(
-            "Updating service {ServiceId}.",
-            id);
+            "Updating service {ServiceId} for user {UserId}.",
+            serviceId,
+            userId);
 
-        var service = await _serviceRepository.GetEntityByIdAsync(id);
+        var provider =
+         await _serviceRepository.GetProviderByUserIdAsync(userId);
+
+        Service? service;
+
+        if (provider == null)
+        {
+            // Admin
+            service = await _serviceRepository.GetEntityByIdAsync(serviceId);
+        }
+        else
+        {
+            // Provider
+            service = await _serviceRepository.GetByIdAndProviderAsync(
+                serviceId,
+                provider.Id);
+        }
 
         if (service == null)
-        {
-            _logger.LogWarning(
-                "Service {ServiceId} not found.",
-                id);
-
             throw new NotFoundException("Service not found.");
-        }
-
-        var category = await _serviceRepository.GetCategoryByIdAsync(dto.CategoryId);
-
-        if (category == null)
-        {
-            _logger.LogWarning(
-                "Category {CategoryId} not found.",
-                dto.CategoryId);
-
-            throw new NotFoundException("Category not found.");
-        }
 
         service.Name = dto.Name;
         service.Description = dto.Description;
         service.BasePrice = dto.BasePrice;
         service.EstimatedMinutes = dto.EstimatedMinutes;
         service.ImageUrl = dto.ImageUrl;
-        service.CategoryId = dto.CategoryId;
 
         await _serviceRepository.UpdateAsync(service);
         await _serviceRepository.SaveChangesAsync();
 
         _logger.LogInformation(
             "Service {ServiceId} updated successfully.",
-            id);
+            serviceId);
     }
 
-    public async Task DeleteAsync(int id)
+    public async Task DeleteAsync(
+        int userId,
+        int serviceId)
     {
         _logger.LogInformation(
-            "Deleting service {ServiceId}.",
-            id);
+            "Deleting service {ServiceId} for user {UserId}.",
+            serviceId,
+            userId);
 
-        var service = await _serviceRepository.GetEntityByIdAsync(id);
+        var provider =
+     await _serviceRepository.GetProviderByUserIdAsync(userId);
+
+        Service? service;
+
+        if (provider == null)
+        {
+            // Admin
+            service = await _serviceRepository.GetEntityByIdAsync(serviceId);
+        }
+        else
+        {
+            // Provider
+            service = await _serviceRepository.GetByIdAndProviderAsync(
+                serviceId,
+                provider.Id);
+        }
 
         if (service == null)
-        {
-            _logger.LogWarning(
-                "Service {ServiceId} not found.",
-                id);
-
             throw new NotFoundException("Service not found.");
-        }
+
 
         service.IsDeleted = true;
 
@@ -160,6 +166,6 @@ public class ServiceService : IServiceService
 
         _logger.LogInformation(
             "Service {ServiceId} deleted successfully.",
-            id);
+            serviceId);
     }
 }

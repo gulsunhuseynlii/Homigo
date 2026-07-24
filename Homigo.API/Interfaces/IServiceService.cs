@@ -1,5 +1,4 @@
-﻿using Homigo.API.DTOs.Common;
-using Homigo.API.DTOs.Service;
+﻿using Homigo.API.DTOs.Service;
 
 namespace Homigo.API.Interfaces;
 
@@ -9,9 +8,9 @@ public interface IServiceService
 
     Task<ServiceDto?> GetByIdAsync(int id);
 
-    Task<ServiceDto> CreateAsync(CreateServiceDto dto);
+    Task<ServiceDto> CreateAsync(int userId, CreateServiceDto dto);
 
-    Task UpdateAsync(int id, UpdateServiceDto dto);
+    Task UpdateAsync(int userId, int serviceId, UpdateServiceDto dto);
 
-    Task DeleteAsync(int id);
+    Task DeleteAsync(int userId, int serviceId);
 }

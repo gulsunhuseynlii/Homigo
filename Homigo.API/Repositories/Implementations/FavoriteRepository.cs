@@ -36,7 +36,8 @@ public class FavoriteRepository
     {
         return await _context.Favorites
             .Include(x => x.Service)
-            .ThenInclude(x => x.Category)
+    .ThenInclude(x => x.Provider)
+        .ThenInclude(x => x.Category)
             .Where(x => x.UserId == userId)
             .ToListAsync();
     }

@@ -5,12 +5,18 @@ namespace Homigo.API.Repositories.Interfaces;
 
 public interface IServiceRepository : IGenericRepository<Service>
 {
-    Task<List<Service>> GetAllWithCategoryAsync();
+    Task<List<Service>> GetAllAsync(ServiceQueryDto query);
 
-    Task<Service?> GetByIdWithCategoryAsync(int id);
+    Task<Service?> GetByIdAsync(int id);
 
     Task<Service?> GetEntityByIdAsync(int id);
 
-    Task<Category?> GetCategoryByIdAsync(int id);
-    Task<List<Service>> GetAllAsync(ServiceQueryDto query);
+    Task<ProviderProfile?> GetProviderAsync(int providerId);
+
+    Task<ProviderProfile?> GetProviderByUserIdAsync(int userId);
+
+    Task<List<Service>> GetProviderServicesAsync(int providerId);
+
+    Task<Service?> GetByIdAndProviderAsync(int serviceId, int providerId);
+    Task<Service?> GetWithProviderAsync(int serviceId);
 }

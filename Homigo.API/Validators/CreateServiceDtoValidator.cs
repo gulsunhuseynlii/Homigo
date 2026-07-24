@@ -20,7 +20,5 @@ public class CreateServiceDtoValidator : AbstractValidator<CreateServiceDto>
         RuleFor(x => x.EstimatedMinutes)
             .GreaterThan(0);
 
-        RuleFor(x => x.CategoryId)
-            .GreaterThan(0);
     }
 }

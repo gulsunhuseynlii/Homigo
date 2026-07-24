@@ -14,7 +14,9 @@ public class ServiceDto
 
     public string? ImageUrl { get; set; }
 
-    public int CategoryId { get; set; }
+    public int ProviderId { get; set; }
+
+    public string ProviderName { get; set; } = string.Empty;
 
     public string CategoryName { get; set; } = string.Empty;
 }

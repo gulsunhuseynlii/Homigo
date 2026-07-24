@@ -32,45 +32,56 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<ProviderProfile>()
             .HasOne(x => x.User)
             .WithOne(x => x.ProviderProfile)
-            .HasForeignKey<ProviderProfile>(x => x.UserId);
+            .HasForeignKey<ProviderProfile>(x => x.UserId)
+            .OnDelete(DeleteBehavior.NoAction);
+
         modelBuilder.Entity<ProviderProfile>()
-    .HasMany(x => x.Services)
-    .WithMany(x => x.Providers);
-        modelBuilder.Entity<ProviderProfile>()
-    .HasOne(x => x.Category)
-    .WithMany()
-    .HasForeignKey(x => x.CategoryId)
-    .OnDelete(DeleteBehavior.NoAction);
+            .HasOne(x => x.Category)
+            .WithMany()
+            .HasForeignKey(x => x.CategoryId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        modelBuilder.Entity<Service>()
+            .HasOne(x => x.Provider)
+            .WithMany(x => x.Services)
+            .HasForeignKey(x => x.ProviderId)
+            .OnDelete(DeleteBehavior.NoAction);
+
         modelBuilder.Entity<Address>()
             .HasOne(x => x.User)
             .WithMany(x => x.Addresses)
-            .HasForeignKey(x => x.UserId);
+            .HasForeignKey(x => x.UserId)
+            .OnDelete(DeleteBehavior.NoAction);
 
         modelBuilder.Entity<Order>()
             .HasOne(x => x.Customer)
             .WithMany(x => x.CustomerOrders)
             .HasForeignKey(x => x.CustomerId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.NoAction);
 
         modelBuilder.Entity<Order>()
             .HasOne(x => x.Provider)
             .WithMany(x => x.ProviderOrders)
             .HasForeignKey(x => x.ProviderId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.NoAction);
 
         modelBuilder.Entity<Order>()
             .HasOne(x => x.Service)
             .WithMany(x => x.Orders)
-            .HasForeignKey(x => x.ServiceId);
+            .HasForeignKey(x => x.ServiceId)
+            .OnDelete(DeleteBehavior.NoAction);
 
         modelBuilder.Entity<Order>()
             .HasOne(x => x.Address)
             .WithMany(x => x.Orders)
-            .HasForeignKey(x => x.AddressId);
+            .HasForeignKey(x => x.AddressId)
+            .OnDelete(DeleteBehavior.NoAction);
+
         modelBuilder.Entity<Review>()
             .HasOne(x => x.Order)
             .WithOne(x => x.Review)
-            .HasForeignKey<Review>(x => x.OrderId);
+            .HasForeignKey<Review>(x => x.OrderId)
+            .OnDelete(DeleteBehavior.NoAction);
 
         modelBuilder.Entity<Review>()
             .HasOne(x => x.Customer)
@@ -87,25 +98,30 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Payment>()
             .HasOne(x => x.Order)
             .WithOne(x => x.Payment)
-            .HasForeignKey<Payment>(x => x.OrderId);
+            .HasForeignKey<Payment>(x => x.OrderId)
+            .OnDelete(DeleteBehavior.NoAction);
 
         modelBuilder.Entity<Favorite>()
             .HasOne(x => x.User)
             .WithMany(x => x.Favorites)
-            .HasForeignKey(x => x.UserId);
+            .HasForeignKey(x => x.UserId)
+            .OnDelete(DeleteBehavior.NoAction);
 
         modelBuilder.Entity<Favorite>()
             .HasOne(x => x.Service)
             .WithMany(x => x.Favorites)
-            .HasForeignKey(x => x.ServiceId);
+            .HasForeignKey(x => x.ServiceId)
+            .OnDelete(DeleteBehavior.NoAction);
 
         modelBuilder.Entity<EmailVerificationToken>()
             .HasOne(x => x.User)
             .WithMany(x => x.EmailVerificationTokens)
-            .HasForeignKey(x => x.UserId);
+            .HasForeignKey(x => x.UserId)
+            .OnDelete(DeleteBehavior.NoAction);
+
         modelBuilder.Entity<Service>()
-    .Property(x => x.BasePrice)
-    .HasPrecision(18, 2);
+            .Property(x => x.BasePrice)
+            .HasPrecision(18, 2);
 
         modelBuilder.Entity<Order>()
             .Property(x => x.TotalPrice)

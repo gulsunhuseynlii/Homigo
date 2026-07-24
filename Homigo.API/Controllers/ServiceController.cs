@@ -1,4 +1,5 @@
-﻿using Homigo.API.DTOs.Service;
+﻿using System.Security.Claims;
+using Homigo.API.DTOs.Service;
 using Homigo.API.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -15,6 +16,7 @@ public class ServiceController : ControllerBase
     {
         _serviceService = serviceService;
     }
+
     [HttpGet]
     public async Task<IActionResult> GetAll([FromQuery] ServiceQueryDto query)
     {
@@ -34,29 +36,48 @@ public class ServiceController : ControllerBase
         return Ok(service);
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Provider")]
     [HttpPost]
     public async Task<IActionResult> Create(CreateServiceDto dto)
     {
-        var service = await _serviceService.CreateAsync(dto);
+        var userId = int.Parse(
+            User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-        return CreatedAtAction(nameof(GetById), new { id = service.Id }, service);
+        var service = await _serviceService.CreateAsync(userId, dto);
+
+        return CreatedAtAction(
+            nameof(GetById),
+            new { id = service.Id },
+            service);
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Provider")]
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, UpdateServiceDto dto)
+    public async Task<IActionResult> Update(
+        int id,
+        UpdateServiceDto dto)
     {
-        await _serviceService.UpdateAsync(id, dto);
+        var userId = int.Parse(
+            User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+        await _serviceService.UpdateAsync(
+            userId,
+            id,
+            dto);
 
         return NoContent();
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Provider")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        await _serviceService.DeleteAsync(id);
+        var userId = int.Parse(
+            User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+        await _serviceService.DeleteAsync(
+            userId,
+            id);
 
         return NoContent();
     }

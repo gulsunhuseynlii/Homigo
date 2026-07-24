@@ -14,11 +14,10 @@ public class Service : BaseEntity
 
     public bool IsActive { get; set; } = true;
 
-    public int CategoryId { get; set; }
+    public int ProviderId { get; set; }
 
-    public Category Category { get; set; } = null!;
+    public ProviderProfile Provider { get; set; } = null!;
     public ICollection<Order> Orders { get; set; } = new List<Order>();
     public ICollection<Favorite> Favorites { get; set; } = new List<Favorite>();
-    public ICollection<ProviderProfile> Providers { get; set; }
-       = new List<ProviderProfile>();
+  
 }

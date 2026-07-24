@@ -22,8 +22,12 @@ public class MappingProfile : Profile
         // -------------------- SERVICE --------------------
 
         CreateMap<Service, ServiceDto>()
-            .ForMember(x => x.CategoryName,
-                opt => opt.MapFrom(x => x.Category.Name));
+     .ForMember(x => x.ProviderId,
+         opt => opt.MapFrom(x => x.Provider.Id))
+     .ForMember(x => x.ProviderName,
+         opt => opt.MapFrom(x => x.Provider.User.FullName))
+     .ForMember(x => x.CategoryName,
+         opt => opt.MapFrom(x => x.Provider.Category.Name));
 
         // -------------------- ADDRESS --------------------
 
@@ -96,11 +100,11 @@ public class MappingProfile : Profile
         // -------------------- FAVORITE --------------------
 
         CreateMap<Favorite, FavoriteDto>()
-            .ForMember(x => x.ServiceName,
-                opt => opt.MapFrom(x => x.Service.Name))
-            .ForMember(x => x.BasePrice,
-                opt => opt.MapFrom(x => x.Service.BasePrice))
-            .ForMember(x => x.CategoryName,
-                opt => opt.MapFrom(x => x.Service.Category.Name));
+     .ForMember(x => x.ServiceName,
+         opt => opt.MapFrom(x => x.Service.Name))
+     .ForMember(x => x.BasePrice,
+         opt => opt.MapFrom(x => x.Service.BasePrice))
+     .ForMember(x => x.CategoryName,
+         opt => opt.MapFrom(x => x.Service.Provider.Category.Name));
     }
 }
