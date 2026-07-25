@@ -15,15 +15,17 @@ function ProviderServices() {
   useEffect(() => {
     loadServices();
   }, []);
+const loadServices = async () => {
+  try {
+    const data = await getMyServices();
 
-  const loadServices = async () => {
-    try {
-      const data = await getMyServices();
-      setServices(data);
-    } catch {
-      toast.error("Failed to load services.");
-    }
-  };
+    console.log(data);
+
+    setServices(data);
+  } catch {
+    toast.error("Failed to load services.");
+  }
+};
 const handleDelete = async (id) => {
   if (!window.confirm("Delete this service?")) return;
 

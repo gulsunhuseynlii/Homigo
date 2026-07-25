@@ -1,4 +1,32 @@
-function OrderCard({ order }) {
+function OrderCard({
+  order,
+  onCancel,
+}) {
+  const getStatusStyle = (status) => {
+    switch (status) {
+      case "Pending":
+        return "bg-yellow-100 text-yellow-700";
+
+      case "Accepted":
+        return "bg-blue-100 text-blue-700";
+
+      case "InProgress":
+        return "bg-purple-100 text-purple-700";
+
+      case "Completed":
+        return "bg-green-100 text-green-700";
+
+      case "Cancelled":
+        return "bg-red-100 text-red-700";
+
+      case "Rejected":
+        return "bg-red-100 text-red-700";
+
+      default:
+        return "bg-slate-100 text-slate-700";
+    }
+  };
+
   return (
     <div className="rounded-2xl bg-white p-6 shadow">
 
@@ -8,9 +36,26 @@ function OrderCard({ order }) {
           {order.serviceName}
         </h2>
 
-        <span className="rounded-full bg-blue-100 px-4 py-2 text-sm text-blue-700">
-          {order.status}
-        </span>
+        <div className="flex items-center gap-3">
+
+          <span
+            className={`rounded-full px-4 py-2 text-sm font-medium ${getStatusStyle(
+              order.status
+            )}`}
+          >
+            {order.status}
+          </span>
+
+          {order.status === "Pending" && (
+            <button
+              onClick={() => onCancel(order.id)}
+              className="rounded-lg bg-red-600 px-4 py-2 text-sm text-white transition hover:bg-red-700"
+            >
+              Cancel
+            </button>
+          )}
+
+        </div>
 
       </div>
 

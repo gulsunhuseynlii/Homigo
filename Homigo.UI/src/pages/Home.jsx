@@ -1,17 +1,30 @@
-import Hero from "../components/home/Hero";
-import CategoriesSection from "../components/home/CategoriesSection";
-import ServicesSection from "../components/home/ServicesSection";
-import BecomeProviderSection from "../components/home/BecomeProviderSection";
+import { isAuthenticated, getRole } from "../utils/auth";
+
+import GuestHome from "./home/GuestHome";
+import CustomerHome from "./home/CustomerHome";
+import ProviderHome from "./home/ProviderHome";
+import AdminHome from "./home/AdminHome";
 
 function Home() {
-  return (
-    <>
-      <Hero />
-      <CategoriesSection />
-      <ServicesSection />
-      <BecomeProviderSection />
-    </>
-  );
+  if (!isAuthenticated()) {
+    return <GuestHome />;
+  }
+
+  const role = getRole();
+
+  switch (role) {
+    case "Admin":
+      return <AdminHome />;
+
+    case "Provider":
+      return <ProviderHome />;
+
+    case "Customer":
+      return <CustomerHome />;
+
+    default:
+      return <GuestHome />;
+  }
 }
 
 export default Home;

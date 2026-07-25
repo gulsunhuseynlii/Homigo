@@ -23,3 +23,7 @@ export const completeOrder = async (id) => {
 
   return response.data;
 };
+export const rejectOrder = async (id) => {
+  const response = await api.put(`/Order/reject/${id}`);
+  return response.data;
+};

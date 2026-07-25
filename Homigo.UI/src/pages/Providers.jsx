@@ -20,15 +20,19 @@ function Providers() {
   const loadProviders = async () => {
     try {
       const data = await getProviders(serviceId);
+
+      console.log(data);
+
       setProviders(data);
-    } catch {
+    } catch (error) {
+      console.log(error.response);
+
       toast.error("Failed to load providers.");
     }
   };
 
   return (
     <div className="mx-auto max-w-7xl px-6 py-10">
-
       <h1 className="mb-8 text-4xl font-bold">
         Choose Provider
       </h1>
@@ -37,22 +41,19 @@ function Providers() {
         <p>No providers found.</p>
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-
           {providers.map((provider) => (
             <ProviderCard
               key={provider.id}
               provider={provider}
               onClick={() =>
                 navigate(
-                  `/booking?serviceId=${serviceId}&providerId=${provider.id}`
+                  `/booking?serviceId=${serviceId}&providerId=${provider.userId}`
                 )
               }
             />
           ))}
-
         </div>
       )}
-
     </div>
   );
 }

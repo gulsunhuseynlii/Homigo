@@ -25,6 +25,7 @@ import CreateService from "../pages/CreateService";
 import EditService from "../pages/EditService";
 import AdminProviders from "../pages/AdminProviders";
 
+
 function AppRoutes() {
   return (
     <MainLayout>
@@ -172,6 +173,22 @@ function AppRoutes() {
   element={
     <ProtectedRoute>
       <AdminProviders />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/provider/services/edit/:id"
+  element={
+    <ProtectedRoute>
+      <EditService />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/provider/jobs"
+  element={
+    <ProtectedRoute roles={["Provider"]}>
+      <ProviderOrders />
     </ProtectedRoute>
   }
 />

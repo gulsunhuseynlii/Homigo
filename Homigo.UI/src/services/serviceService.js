@@ -14,7 +14,11 @@ export const getServiceById = async (id) => {
   return response.data;
 };
 export const createService = async (data) => {
-  const response = await api.post("/Service", data);
+  const response = await api.post("/Service", data, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
 
   return response.data;
 };

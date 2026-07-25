@@ -51,7 +51,12 @@ function Booking() {
     toast.error("Failed to load booking.");
   }
 };
-
+console.log({
+  serviceId: Number(serviceId),
+  providerId: Number(providerId),
+  addressId: Number(addressId),
+  scheduledDate,
+});
   const handleSubmit = async () => {
     if (!scheduledDate) {
       toast.error("Please select a date.");
@@ -70,9 +75,12 @@ function Booking() {
       toast.success("Order created successfully.");
 
       navigate("/my-orders");
-    } catch {
-      toast.error("Booking failed.");
-    }
+    } catch (error) {
+  console.log(error.response);
+  console.log(error.response?.data);
+
+  toast.error("Failed to create order.");
+}
   };
 
   if (!service || !provider)

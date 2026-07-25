@@ -43,3 +43,7 @@ export const approveProvider = async (userId) => {
 export const rejectProvider = async (userId) => {
   await api.put(`/Provider/reject/${userId}`);
 };
+export const getMyServices = async () => {
+  const response = await api.get("/Service/my");
+  return response.data;
+};

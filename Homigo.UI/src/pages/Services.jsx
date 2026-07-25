@@ -57,6 +57,13 @@ function Services() {
               key={service.id}
               className="rounded-2xl border border-slate-200 bg-white p-6 shadow transition hover:shadow-xl"
             >
+              {service.imageUrl && (
+  <img
+    src={`https://localhost:7121${service.imageUrl}`}
+    alt={service.name}
+    className="mb-4 h-52 w-full rounded-xl object-cover"
+  />
+)}
               <h2 className="text-2xl font-bold">
                 {service.name}
               </h2>

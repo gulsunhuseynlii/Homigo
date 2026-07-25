@@ -3,6 +3,7 @@ import toast from "react-hot-toast";
 
 import { getMyOrders } from "../services/orderService";
 import OrderCard from "../components/order/OrderCard";
+import { cancelOrder } from "../services/orderService";
 
 function MyOrders() {
 
@@ -25,7 +26,19 @@ function MyOrders() {
 
     }
   };
+const handleCancel = async (id) => {
+  if (!window.confirm("Cancel this order?")) return;
 
+  try {
+    await cancelOrder(id);
+
+    toast.success("Order cancelled.");
+
+    loadOrders();
+  } catch {
+    toast.error("Failed to cancel order.");
+  }
+};
   return (
     <div className="mx-auto max-w-6xl px-6 py-10">
 
@@ -49,10 +62,11 @@ function MyOrders() {
 
           {orders.map((order) => (
 
-            <OrderCard
-              key={order.id}
-              order={order}
-            />
+          <OrderCard
+  key={order.id}
+  order={order}
+  onCancel={handleCancel}
+/>
 
           ))}
 

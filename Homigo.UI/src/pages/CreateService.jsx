@@ -3,33 +3,18 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
 import { createService } from "../services/serviceService";
-import { getCategories } from "../services/categoryService";
 
 function CreateService() {
   const navigate = useNavigate();
 
-  const [categories, setCategories] = useState([]);
 
-  const [form, setForm] = useState({
-    name: "",
-    description: "",
-    basePrice: "",
-    estimatedMinutes: "",
-    categoryId: "",
-  });
-
-  useEffect(() => {
-    loadCategories();
-  }, []);
-
-  const loadCategories = async () => {
-    try {
-      const data = await getCategories();
-      setCategories(data.items ?? data);
-    } catch {
-      toast.error("Failed to load categories.");
-    }
-  };
+const [form, setForm] = useState({
+  name: "",
+  description: "",
+  basePrice: "",
+  estimatedMinutes: "",
+  image: null,
+});
 
   const handleChange = (e) => {
     setForm({
@@ -39,23 +24,28 @@ function CreateService() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    try {
-      await createService({
-        ...form,
-        basePrice: Number(form.basePrice),
-        estimatedMinutes: Number(form.estimatedMinutes),
-        categoryId: Number(form.categoryId),
-      });
+  try {
+    const formData = new FormData();
 
-      toast.success("Service created successfully.");
+    formData.append("Name", form.name);
+    formData.append("Description", form.description);
+    formData.append("BasePrice", form.basePrice);
+    formData.append("EstimatedMinutes", form.estimatedMinutes);
 
-      navigate("/provider/services");
-    } catch {
-      toast.error("Failed to create service.");
+    if (form.image) {
+      formData.append("Image", form.image);
     }
-  };
+
+    await createService(formData);
+
+    toast.success("Service created successfully.");
+    navigate("/provider/services");
+  } catch {
+    toast.error("Failed to create service.");
+  }
+};
 
   return (
     <div className="mx-auto max-w-3xl px-6 py-10">
@@ -103,26 +93,24 @@ function CreateService() {
           onChange={handleChange}
           className="w-full rounded-xl border p-3"
         />
+<div>
+  <label className="mb-2 block font-medium">
+    Service Image
+  </label>
 
-        <select
-          name="categoryId"
-          value={form.categoryId}
-          onChange={handleChange}
-          className="w-full rounded-xl border p-3"
-        >
-          <option value="">
-            Select Category
-          </option>
-
-          {categories.map((category) => (
-            <option
-              key={category.id}
-              value={category.id}
-            >
-              {category.name}
-            </option>
-          ))}
-        </select>
+  <input
+    type="file"
+    accept="image/*"
+    onChange={(e) =>
+      setForm({
+        ...form,
+        image: e.target.files[0],
+      })
+    }
+    className="w-full rounded-xl border p-3"
+  />
+</div>
+       
 
         <button
           className="rounded-xl bg-blue-600 px-6 py-3 text-white hover:bg-blue-700"

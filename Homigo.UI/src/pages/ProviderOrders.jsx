@@ -6,6 +6,7 @@ import ProviderOrderCard from "../components/provider/ProviderOrderCard";
 import {
   getMyJobs,
   acceptOrder,
+  rejectOrder,
   startOrder,
   completeOrder,
 } from "../services/providerOrderService";
@@ -38,7 +39,17 @@ function ProviderOrders() {
       toast.error("Failed to accept order.");
     }
   };
+const handleReject = async (id) => {
+  try {
+    await rejectOrder(id);
 
+    toast.success("Order rejected.");
+
+    loadOrders();
+  } catch {
+    toast.error("Failed to reject order.");
+  }
+};
   const handleStart = async (id) => {
     try {
       await startOrder(id);
@@ -85,13 +96,14 @@ function ProviderOrders() {
         <div className="space-y-6">
 
           {orders.map((order) => (
-            <ProviderOrderCard
-              key={order.id}
-              order={order}
-              onAccept={handleAccept}
-              onStart={handleStart}
-              onComplete={handleComplete}
-            />
+           <ProviderOrderCard
+  key={order.id}
+  order={order}
+  onAccept={handleAccept}
+  onReject={handleReject}
+  onStart={handleStart}
+  onComplete={handleComplete}
+/>
           ))}
 
         </div>
