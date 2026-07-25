@@ -4,7 +4,9 @@ namespace Homigo.API.Interfaces;
 
 public interface IPaymentService
 {
-    Task<PaymentDto> PayAsync(int customerId, CreatePaymentDto dto);
-
+    Task<PaymentDto> PayAsync(
+    int customerId,
+    int orderId,
+    CreatePaymentDto dto);
     Task<List<PaymentDto>> GetMyPaymentsAsync(int customerId);
 }

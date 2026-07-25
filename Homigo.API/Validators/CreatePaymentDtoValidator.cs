@@ -7,10 +7,20 @@ public class CreatePaymentDtoValidator : AbstractValidator<CreatePaymentDto>
 {
     public CreatePaymentDtoValidator()
     {
-        RuleFor(x => x.OrderId)
-            .GreaterThan(0);
 
         RuleFor(x => x.PaymentMethod)
+            .NotEmpty();
+
+        RuleFor(x => x.CardNumber)
+            .NotEmpty();
+
+        RuleFor(x => x.CardHolder)
+            .NotEmpty();
+
+        RuleFor(x => x.Expiry)
+            .NotEmpty();
+
+        RuleFor(x => x.Cvv)
             .NotEmpty();
     }
 }

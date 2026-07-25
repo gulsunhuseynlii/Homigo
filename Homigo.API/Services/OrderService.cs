@@ -25,34 +25,34 @@ public class OrderService : IOrderService
         _mapper = mapper;
     }
 
-    public async Task CreateAsync(int userId, CreateOrderDto dto)
+    public async Task<int> CreateAsync(
+    int userId,
+    CreateOrderDto dto)
     {
         _logger.LogInformation(
             "Customer {UserId} is creating an order.",
             userId);
 
-        var service = await _orderRepository.GetServiceAsync(dto.ServiceId);
+        var service =
+            await _orderRepository.GetServiceAsync(dto.ServiceId);
 
         if (service == null)
-        {
             throw new NotFoundException("Service not found.");
-        }
 
         var address =
-            await _orderRepository.GetAddressAsync(dto.AddressId, userId);
+            await _orderRepository.GetAddressAsync(
+                dto.AddressId,
+                userId);
 
         if (address == null)
-        {
             throw new NotFoundException("Address not found.");
-        }
 
         var provider =
-            await _orderRepository.GetApprovedProviderAsync(dto.ProviderId);
+            await _orderRepository.GetApprovedProviderAsync(
+                dto.ProviderId);
 
         if (provider == null)
-        {
             throw new NotFoundException("Provider not found.");
-        }
 
         var order = new Order
         {
@@ -62,7 +62,8 @@ public class OrderService : IOrderService
             AddressId = dto.AddressId,
             ScheduledDate = dto.ScheduledDate,
             TotalPrice = service.BasePrice,
-            Status = OrderStatus.Pending
+            Status = OrderStatus.Pending,
+            PaymentStatus = PaymentStatus.Unpaid
         };
 
         await _orderRepository.AddAsync(order);
@@ -71,6 +72,8 @@ public class OrderService : IOrderService
         _logger.LogInformation(
             "Order {OrderId} created successfully.",
             order.Id);
+
+        return order.Id;
     }
 
     public async Task<List<OrderDto>> GetMyOrdersAsync(int userId)
@@ -178,6 +181,60 @@ public class OrderService : IOrderService
 
         _logger.LogInformation(
             "Order {OrderId} completed successfully.",
+            orderId);
+    }
+    public async Task CancelOrderAsync(int orderId, int customerId)
+    {
+        _logger.LogInformation(
+            "Customer {CustomerId} is cancelling order {OrderId}.",
+            customerId,
+            orderId);
+
+        var order = await _orderRepository.GetOrderByIdAsync(orderId);
+
+        if (order == null)
+            throw new NotFoundException("Order not found.");
+
+        if (order.CustomerId != customerId)
+            throw new BadRequestException("This order does not belong to you.");
+
+        if (order.Status != OrderStatus.Pending)
+            throw new BadRequestException("Only pending orders can be cancelled.");
+
+        order.Status = OrderStatus.Cancelled;
+
+        await _orderRepository.UpdateAsync(order);
+        await _orderRepository.SaveChangesAsync();
+
+        _logger.LogInformation(
+            "Order {OrderId} cancelled successfully.",
+            orderId);
+    }
+    public async Task RejectOrderAsync(int orderId, int providerUserId)
+    {
+        _logger.LogInformation(
+            "Provider {ProviderId} is rejecting order {OrderId}.",
+            providerUserId,
+            orderId);
+
+        var order = await _orderRepository.GetOrderByIdAsync(orderId);
+
+        if (order == null)
+            throw new NotFoundException("Order not found.");
+
+        if (order.ProviderId != providerUserId)
+            throw new BadRequestException("This order does not belong to you.");
+
+        if (order.Status != OrderStatus.Pending)
+            throw new BadRequestException("Order is not pending.");
+
+        order.Status = OrderStatus.Rejected;
+
+        await _orderRepository.UpdateAsync(order);
+        await _orderRepository.SaveChangesAsync();
+
+        _logger.LogInformation(
+            "Order {OrderId} rejected successfully.",
             orderId);
     }
 }

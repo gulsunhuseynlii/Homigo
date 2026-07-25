@@ -21,12 +21,15 @@ public class OrderController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create(CreateOrderDto dto)
     {
-        var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var userId =
+            int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-        await _orderService.CreateAsync(userId, dto);
+        var orderId =
+            await _orderService.CreateAsync(userId, dto);
 
         return Ok(new
         {
+            orderId,
             message = "Order created successfully."
         });
     }
@@ -92,6 +95,34 @@ public class OrderController : ControllerBase
         return Ok(new
         {
             message = "Order accepted successfully."
+        });
+    }
+    [Authorize(Roles = "Customer")]
+    [HttpPut("cancel/{id}")]
+    public async Task<IActionResult> Cancel(int id)
+    {
+        var customerId =
+            int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+        await _orderService.CancelOrderAsync(id, customerId);
+
+        return Ok(new
+        {
+            message = "Order cancelled successfully."
+        });
+    }
+    [Authorize(Roles = "Provider")]
+    [HttpPut("reject/{id}")]
+    public async Task<IActionResult> Reject(int id)
+    {
+        var providerUserId =
+            int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+        await _orderService.RejectOrderAsync(id, providerUserId);
+
+        return Ok(new
+        {
+            message = "Order rejected successfully."
         });
     }
 }

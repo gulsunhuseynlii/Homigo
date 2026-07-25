@@ -4,7 +4,7 @@ namespace Homigo.API.Interfaces;
 
 public interface IOrderService
 {
-    Task CreateAsync(int userId, CreateOrderDto dto);
+    Task<int> CreateAsync(int userId, CreateOrderDto dto);
 
     Task<List<OrderDto>> GetMyOrdersAsync(int userId);
 
@@ -15,4 +15,8 @@ public interface IOrderService
     Task StartOrderAsync(int orderId, int providerUserId);
 
     Task CompleteOrderAsync(int orderId, int providerUserId);
+
+    Task CancelOrderAsync(int orderId, int customerId);
+
+    Task RejectOrderAsync(int orderId, int providerUserId);
 }

@@ -36,23 +36,25 @@ public class MappingProfile : Profile
         // -------------------- PROVIDER --------------------
 
         CreateMap<ProviderProfile, ProviderDto>()
-            .ForMember(x => x.FullName,
-                opt => opt.MapFrom(x => x.User.FullName))
-            .ForMember(x => x.Email,
-                opt => opt.MapFrom(x => x.User.Email))
-            .ForMember(x => x.PhoneNumber,
-                opt => opt.MapFrom(x => x.PhoneNumber))
-            .ForMember(x => x.ProfileImageUrl,
-                opt => opt.MapFrom(x => x.ProfileImageUrl))
-            .ForMember(x => x.CategoryName,
-                opt => opt.MapFrom(x => x.Category.Name))
-            .ForMember(x => x.Experience,
-                opt => opt.MapFrom(x => $"{x.YearsOfExperience} years"))
-            .ForMember(x => x.AverageRating,
-                opt => opt.MapFrom(x =>
-                    x.Reviews.Any()
-                        ? x.Reviews.Average(r => r.Rating)
-                        : 0));
+     .ForMember(x => x.UserId,
+         opt => opt.MapFrom(x => x.UserId))
+     .ForMember(x => x.FullName,
+         opt => opt.MapFrom(x => x.User.FullName))
+     .ForMember(x => x.Email,
+         opt => opt.MapFrom(x => x.User.Email))
+     .ForMember(x => x.PhoneNumber,
+         opt => opt.MapFrom(x => x.PhoneNumber))
+     .ForMember(x => x.ProfileImageUrl,
+         opt => opt.MapFrom(x => x.ProfileImageUrl))
+     .ForMember(x => x.CategoryName,
+         opt => opt.MapFrom(x => x.Category.Name))
+     .ForMember(x => x.Experience,
+         opt => opt.MapFrom(x => $"{x.YearsOfExperience} years"))
+     .ForMember(x => x.AverageRating,
+         opt => opt.MapFrom(x =>
+             x.Reviews.Any()
+                 ? x.Reviews.Average(r => r.Rating)
+                 : 0));
 
         CreateMap<ProviderProfile, ProviderApplicationDto>()
             .ForMember(x => x.UserId,

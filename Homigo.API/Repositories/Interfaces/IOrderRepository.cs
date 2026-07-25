@@ -15,4 +15,5 @@ public interface IOrderRepository : IGenericRepository<Order>
     Task<List<Order>> GetProviderOrdersAsync(int providerUserId);
 
     Task<Order?> GetOrderByIdAsync(int id);
+
 }

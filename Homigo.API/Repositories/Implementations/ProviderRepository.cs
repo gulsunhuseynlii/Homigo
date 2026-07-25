@@ -60,11 +60,14 @@ public class ProviderRepository
     public async Task<ProviderProfile?> GetApprovedByIdAsync(int id)
     {
         return await _context.ProviderProfiles
-     .Include(x => x.User)
-     .Include(x => x.Category)
-     .Include(x => x.Reviews)
-     .Include(x => x.Services)
-     .FirstOrDefaultAsync(x => x.Id == id && x.IsApproved && !x.IsDeleted);
+            .Include(x => x.User)
+            .Include(x => x.Category)
+            .Include(x => x.Reviews)
+            .Include(x => x.Services)
+            .FirstOrDefaultAsync(x =>
+                x.UserId == id &&
+                x.IsApproved &&
+                !x.IsDeleted);
     }
     public async Task<List<Service>> GetServicesByIdsAsync(List<int> serviceIds)
     {

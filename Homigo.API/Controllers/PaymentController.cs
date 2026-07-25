@@ -18,13 +18,16 @@ public class PaymentController : ControllerBase
         _paymentService = paymentService;
     }
 
-    [HttpPost("pay")]
-    public async Task<IActionResult> Pay(CreatePaymentDto dto)
+    [HttpPost("pay/{orderId}")]
+    public async Task<IActionResult> Pay(
+     int orderId,
+     CreatePaymentDto dto)
     {
         var customerId =
             int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-        var result = await _paymentService.PayAsync(customerId, dto);
+        var result =
+            await _paymentService.PayAsync(customerId, orderId, dto);
 
         return Ok(result);
     }

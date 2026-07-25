@@ -25,6 +25,7 @@ public class Order : BaseEntity
     public decimal TotalPrice { get; set; }
 
     public OrderStatus Status { get; set; }
+    public PaymentStatus PaymentStatus { get; set; } = PaymentStatus.Unpaid;
     public Review? Review { get; set; }
     public Payment? Payment { get; set; }
 }

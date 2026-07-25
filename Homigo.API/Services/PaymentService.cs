@@ -25,32 +25,38 @@ public class PaymentService : IPaymentService
         _mapper = mapper;
     }
 
-    public async Task<PaymentDto> PayAsync(int customerId, CreatePaymentDto dto)
+    public async Task<PaymentDto> PayAsync(
+     int customerId,
+     int orderId,
+     CreatePaymentDto dto)
     {
         _logger.LogInformation(
             "Customer {CustomerId} is trying to pay for order {OrderId}.",
             customerId,
-            dto.OrderId);
+            orderId);
 
-        var order = await _paymentRepository.GetCompletedOrderAsync(dto.OrderId, customerId);
+        var order =
+    await _paymentRepository.GetOrderForPaymentAsync(
+        orderId,
+        customerId);
 
         if (order == null)
         {
             _logger.LogWarning(
-                "Completed order {OrderId} not found for customer {CustomerId}.",
-                dto.OrderId,
+                "Order {OrderId} not found for customer {CustomerId}.",
+                orderId,
                 customerId);
 
-            throw new NotFoundException("Completed order not found.");
+            throw new NotFoundException("Order not found.");
         }
 
-        var exists = await _paymentRepository.PaymentExistsAsync(dto.OrderId);
+        var exists = await _paymentRepository.PaymentExistsAsync(orderId);
 
         if (exists)
         {
             _logger.LogWarning(
                 "Payment already exists for order {OrderId}.",
-                dto.OrderId);
+                orderId);
 
             throw new BadRequestException("Payment already exists.");
         }
@@ -64,6 +70,8 @@ public class PaymentService : IPaymentService
             TransactionId = Guid.NewGuid().ToString(),
             CreatedAt = DateTime.UtcNow
         };
+
+        order.PaymentStatus = PaymentStatus.Paid;
 
         await _paymentRepository.AddAsync(payment);
         await _paymentRepository.SaveChangesAsync();
