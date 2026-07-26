@@ -24,7 +24,8 @@ import ProviderServices from "../pages/ProviderServices";
 import CreateService from "../pages/CreateService";
 import EditService from "../pages/EditService";
 import AdminProviders from "../pages/AdminProviders";
-
+import Payment from "../pages/Payment";
+import PaymentSuccess from "../pages/PaymentSuccess";
 
 function AppRoutes() {
   return (
@@ -191,6 +192,18 @@ function AppRoutes() {
       <ProviderOrders />
     </ProtectedRoute>
   }
+/>
+<Route
+  path="/payment"
+  element={
+    <ProtectedRoute roles={["Customer"]}>
+      <Payment />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/payment-success"
+  element={<PaymentSuccess />}
 />
       </Routes>
     </MainLayout>

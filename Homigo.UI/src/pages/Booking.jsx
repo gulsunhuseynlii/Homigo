@@ -57,31 +57,35 @@ console.log({
   addressId: Number(addressId),
   scheduledDate,
 });
-  const handleSubmit = async () => {
-    if (!scheduledDate) {
-      toast.error("Please select a date.");
+const handleSubmit = async () => {
+  if (!scheduledDate) {
+    toast.error("Please select a date.");
+    return;
+  }
 
-      return;
-    }
+  try {
+    const result = await createOrder({
+      serviceId: Number(serviceId),
+      providerId: Number(providerId),
+      addressId: Number(addressId),
+      scheduledDate,
+    });
 
-    try {
-      await createOrder({
-        serviceId: Number(serviceId),
-        providerId: Number(providerId),
-        addressId: Number(addressId),
-        scheduledDate,
-      });
+    toast.success("Order created successfully.");
 
-      toast.success("Order created successfully.");
-
-      navigate("/my-orders");
-    } catch (error) {
-  console.log(error.response);
-  console.log(error.response?.data);
-
-  toast.error("Failed to create order.");
-}
-  };
+    navigate("/payment", {
+      state: {
+        orderId: result.orderId,
+        serviceName: service.name,
+        providerName: provider.fullName,
+        totalPrice: service.basePrice,
+      },
+    });
+  } catch (error) {
+    console.log(error.response);
+    toast.error("Failed to create order.");
+  }
+};
 
   if (!service || !provider)
     return <h2 className="p-10">Loading...</h2>;
