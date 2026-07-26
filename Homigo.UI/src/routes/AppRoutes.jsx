@@ -26,6 +26,7 @@ import EditService from "../pages/EditService";
 import AdminProviders from "../pages/AdminProviders";
 import Payment from "../pages/Payment";
 import PaymentSuccess from "../pages/PaymentSuccess";
+import MyPayments from "../pages/MyPayments";
 
 function AppRoutes() {
   return (
@@ -204,6 +205,14 @@ function AppRoutes() {
 <Route
   path="/payment-success"
   element={<PaymentSuccess />}
+/>
+<Route
+  path="/my-payments"
+  element={
+    <ProtectedRoute roles={["Customer"]}>
+      <MyPayments />
+    </ProtectedRoute>
+  }
 />
       </Routes>
     </MainLayout>

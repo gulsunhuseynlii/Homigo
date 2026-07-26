@@ -98,7 +98,12 @@ function Navbar() {
                   >
                     My Orders
                   </Link>
-
+<Link
+  to="/my-payments"
+  className="font-semibold transition hover:text-blue-100"
+>
+  My Payments
+</Link>
                   <Link
                     to="/favorites"
                     className="font-semibold transition hover:text-blue-100"
