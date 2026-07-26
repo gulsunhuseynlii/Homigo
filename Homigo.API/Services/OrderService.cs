@@ -15,15 +15,18 @@ public class OrderService : IOrderService
     private readonly ILogger<OrderService> _logger;
     private readonly IMapper _mapper;
     private readonly IPaymentRepository _paymentRepository;
+    private readonly IPaymentService _paymentService;
 
     public OrderService(
      IOrderRepository orderRepository,
      IPaymentRepository paymentRepository,
+      IPaymentService paymentService,
      IMapper mapper,
      ILogger<OrderService> logger)
     {
         _orderRepository = orderRepository;
         _paymentRepository = paymentRepository;
+        _paymentService = paymentService;
         _mapper = mapper;
         _logger = logger;
     }
@@ -205,15 +208,11 @@ public class OrderService : IOrderService
             throw new BadRequestException("Only pending orders can be cancelled.");
 
         order.Status = OrderStatus.Cancelled;
-        order.PaymentStatus = PaymentStatus.Refunded;
+       
 
-        var payment = await _paymentRepository.GetByOrderIdAsync(orderId);
-
-        if (payment != null)
+        if (order.PaymentStatus == PaymentStatus.Paid)
         {
-            payment.Status = PaymentStatus.Refunded;
-
-            await _paymentRepository.UpdateAsync(payment);
+            await _paymentService.RefundPaymentAsync(orderId);
         }
 
         await _orderRepository.UpdateAsync(order);
@@ -242,15 +241,11 @@ public class OrderService : IOrderService
             throw new BadRequestException("Order is not pending.");
 
         order.Status = OrderStatus.Rejected;
-        order.PaymentStatus = PaymentStatus.Refunded;
+ 
 
-        var payment = await _paymentRepository.GetByOrderIdAsync(orderId);
-
-        if (payment != null)
+        if (order.PaymentStatus == PaymentStatus.Paid)
         {
-            payment.Status = PaymentStatus.Refunded;
-
-            await _paymentRepository.UpdateAsync(payment);
+            await _paymentService.RefundPaymentAsync(orderId);
         }
 
         await _orderRepository.UpdateAsync(order);

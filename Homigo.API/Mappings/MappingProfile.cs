@@ -94,7 +94,13 @@ public class MappingProfile : Profile
 
         // -------------------- PAYMENT --------------------
 
-        CreateMap<Payment, PaymentDto>();
+        CreateMap<Payment, PaymentDto>()
+     .ForMember(
+         dest => dest.Status,
+         opt => opt.MapFrom(src => src.Status.ToString()))
+     .ForMember(
+         dest => dest.ServiceName,
+         opt => opt.MapFrom(src => src.Order.Service.Name));
 
         // -------------------- REVIEW --------------------
 

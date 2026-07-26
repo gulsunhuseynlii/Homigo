@@ -37,10 +37,11 @@ public class PaymentRepository
     }
 
     public async Task<List<Payment>> GetCustomerPaymentsAsync(
-        int customerId)
+    int customerId)
     {
         return await _context.Payments
             .Include(x => x.Order)
+            .ThenInclude(x => x.Service)
             .Where(x => x.Order.CustomerId == customerId)
             .OrderByDescending(x => x.CreatedAt)
             .ToListAsync();

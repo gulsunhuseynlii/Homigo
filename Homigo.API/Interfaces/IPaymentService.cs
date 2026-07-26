@@ -10,5 +10,5 @@ public interface IPaymentService
 
     Task<List<PaymentDto>> GetMyPaymentsAsync(
         int customerId);
- 
+    Task RefundPaymentAsync(int orderId);
 }

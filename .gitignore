@@ -15,3 +15,5 @@ obj/
 # Logs
 *.log
 Homigo.API/wwwroot/uploads/
+appsettings.Development.json
+appsettings.json

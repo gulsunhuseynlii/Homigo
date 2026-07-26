@@ -16,14 +16,17 @@ public class PaymentService : IPaymentService
     private readonly ILogger<PaymentService> _logger;
     private readonly IMapper _mapper;
     private readonly IConfiguration _configuration;
+    private readonly IOrderRepository _orderRepository;
 
     public PaymentService(
-        IPaymentRepository paymentRepository,
-        ILogger<PaymentService> logger,
-        IMapper mapper,
-        IConfiguration configuration)
+      IPaymentRepository paymentRepository,
+      IOrderRepository orderRepository,
+      ILogger<PaymentService> logger,
+      IMapper mapper,
+      IConfiguration configuration)
     {
         _paymentRepository = paymentRepository;
+        _orderRepository = orderRepository;
         _logger = logger;
         _mapper = mapper;
         _configuration = configuration;
@@ -121,5 +124,45 @@ public class PaymentService : IPaymentService
         var payments = await _paymentRepository.GetCustomerPaymentsAsync(customerId);
 
         return _mapper.Map<List<PaymentDto>>(payments);
+    }
+    public async Task RefundPaymentAsync(int orderId)
+    {
+        _logger.LogInformation(
+            "Refund requested for order {OrderId}.",
+            orderId);
+
+        var payment =
+            await _paymentRepository.GetByOrderIdAsync(orderId);
+
+        if (payment == null)
+            throw new NotFoundException("Payment not found.");
+
+        if (payment.Status == PaymentStatus.Refunded)
+            throw new BadRequestException("Payment already refunded.");
+        var order = await _paymentRepository.GetOrderByIdAsync(orderId);
+
+        if (order == null)
+            throw new NotFoundException("Order not found.");
+
+        var refundService = new Stripe.RefundService();
+
+        var options = new Stripe.RefundCreateOptions
+        {
+            PaymentIntent = payment.TransactionId
+        };
+
+        await refundService.CreateAsync(options);
+
+        payment.Status = PaymentStatus.Refunded;
+        order.PaymentStatus = PaymentStatus.Refunded;
+
+        await _paymentRepository.UpdateAsync(payment);
+        await _orderRepository.UpdateAsync(order);
+
+        await _paymentRepository.SaveChangesAsync();
+
+        _logger.LogInformation(
+            "Refund completed for order {OrderId}.",
+            orderId);
     }
 }
