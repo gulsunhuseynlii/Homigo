@@ -18,16 +18,16 @@ public class PaymentController : ControllerBase
         _paymentService = paymentService;
     }
 
-    [HttpPost("pay/{orderId}")]
-    public async Task<IActionResult> Pay(
-     int orderId,
-     CreatePaymentDto dto)
+    [HttpPost("checkout/{orderId}")]
+    public async Task<IActionResult> CreateCheckoutSession(int orderId)
     {
         var customerId =
             int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
         var result =
-            await _paymentService.PayAsync(customerId, orderId, dto);
+            await _paymentService.CreateCheckoutSessionAsync(
+                customerId,
+                orderId);
 
         return Ok(result);
     }
@@ -38,8 +38,10 @@ public class PaymentController : ControllerBase
         var customerId =
             int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-        var result = await _paymentService.GetMyPaymentsAsync(customerId);
+        var result =
+            await _paymentService.GetMyPaymentsAsync(customerId);
 
         return Ok(result);
     }
+   
 }

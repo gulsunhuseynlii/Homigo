@@ -86,6 +86,9 @@ public class MappingProfile : Profile
                     x.Provider == null ? null : x.Provider.FullName))
             .ForMember(x => x.Status,
                 opt => opt.MapFrom(x => x.Status.ToString()))
+            .ForMember(
+    dest => dest.PaymentStatus,
+    opt => opt.MapFrom(src => src.PaymentStatus.ToString()))
             .ForMember(x => x.CustomerName,
                 opt => opt.MapFrom(x => x.Customer.FullName));
 

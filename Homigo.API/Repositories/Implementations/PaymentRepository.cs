@@ -45,4 +45,14 @@ public class PaymentRepository
             .OrderByDescending(x => x.CreatedAt)
             .ToListAsync();
     }
+    public async Task<Payment?> GetByOrderIdAsync(int orderId)
+    {
+        return await _context.Payments
+            .FirstOrDefaultAsync(x => x.OrderId == orderId);
+    }
+    public async Task<Order?> GetOrderByIdAsync(int orderId)
+    {
+        return await _context.Orders
+            .FirstOrDefaultAsync(x => x.Id == orderId);
+    }
 }

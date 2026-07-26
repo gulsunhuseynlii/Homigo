@@ -8,6 +8,7 @@ using Homigo.API.Middlewares;
 using Homigo.API.Repositories.Implementations;
 using Homigo.API.Repositories.Interfaces;
 using Homigo.API.Services;
+using Homigo.API.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -24,6 +25,8 @@ namespace Homigo.API
             // Add services to the container.
 
             builder.Services.AddControllers();
+            builder.Services.Configure<StripeSettings>(
+    builder.Configuration.GetSection("Stripe"));
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddScoped<IAuthService, AuthService>();
@@ -116,7 +119,8 @@ namespace Homigo.API
                           .AllowAnyMethod();
                 });
             });
-
+            Stripe.StripeConfiguration.ApiKey =
+    builder.Configuration["Stripe:SecretKey"];
             var app = builder.Build();
             using (var scope = app.Services.CreateScope())
             {

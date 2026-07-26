@@ -13,7 +13,7 @@ public class OrderDto
     public DateTime ScheduledDate { get; set; }
 
     public string Status { get; set; } = string.Empty;
-
+    public string PaymentStatus { get; set; } = string.Empty;
     public string? ProviderName { get; set; }
     public string CustomerName { get; set; } = string.Empty;
 }
