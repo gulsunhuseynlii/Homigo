@@ -94,4 +94,15 @@ public class ReviewService : IReviewService
 
         return _mapper.Map<List<ReviewDto>>(reviews);
     }
+    public async Task<List<ReviewDto>> GetServiceReviewsAsync(int serviceId)
+    {
+        _logger.LogInformation(
+            "Getting reviews for service {ServiceId}.",
+            serviceId);
+
+        var reviews =
+            await _reviewRepository.GetServiceReviewsAsync(serviceId);
+
+        return _mapper.Map<List<ReviewDto>>(reviews);
+    }
 }

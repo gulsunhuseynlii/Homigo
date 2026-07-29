@@ -10,4 +10,5 @@ public interface IReviewRepository : IGenericRepository<Review>
 
     Task<bool> ReviewExistsAsync(int orderId);
     Task<bool> PaymentExistsAsync(int orderId);
+    Task<List<Review>> GetServiceReviewsAsync(int serviceId);
 }

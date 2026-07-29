@@ -40,4 +40,12 @@ public class ReviewController : ControllerBase
 
         return Ok(result);
     }
+    [HttpGet("service/{serviceId}")]
+    public async Task<IActionResult> GetServiceReviews(int serviceId)
+    {
+        var result =
+            await _reviewService.GetServiceReviewsAsync(serviceId);
+
+        return Ok(result);
+    }
 }

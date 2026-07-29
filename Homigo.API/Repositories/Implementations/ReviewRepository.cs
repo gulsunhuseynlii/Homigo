@@ -46,5 +46,15 @@ public class ReviewRepository
             .AnyAsync(x =>
                 x.OrderId == orderId &&
                 x.Status == PaymentStatus.Paid);
+ 
+    }
+    public async Task<List<Review>> GetServiceReviewsAsync(int serviceId)
+    {
+        return await _context.Reviews
+            .Include(x => x.Customer)
+            .Include(x => x.Order)
+            .Where(x => x.Order.ServiceId == serviceId)
+            .OrderByDescending(x => x.CreatedAt)
+            .ToListAsync();
     }
 }

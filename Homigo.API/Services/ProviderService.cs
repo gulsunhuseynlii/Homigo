@@ -106,7 +106,7 @@ public class ProviderService : IProviderService
             return;
         }
 
-        // İlk dəfə müraciət edirsə
+ 
         provider = new ProviderProfile
         {
             UserId = userId,
