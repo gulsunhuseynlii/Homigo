@@ -1,6 +1,7 @@
 function OrderCard({
   order,
   onCancel,
+  onReview,
 }) {
   const getStatusStyle = (status) => {
     switch (status) {
@@ -17,8 +18,6 @@ function OrderCard({
         return "bg-green-100 text-green-700";
 
       case "Cancelled":
-        return "bg-red-100 text-red-700";
-
       case "Rejected":
         return "bg-red-100 text-red-700";
 
@@ -32,11 +31,11 @@ function OrderCard({
       case "Paid":
         return "bg-green-100 text-green-700";
 
-      case "Unpaid":
+      case "Refunded":
         return "bg-red-100 text-red-700";
 
-      case "Pending":
-        return "bg-yellow-100 text-yellow-700";
+      case "Unpaid":
+        return "bg-gray-100 text-gray-700";
 
       default:
         return "bg-slate-100 text-slate-700";
@@ -45,15 +44,12 @@ function OrderCard({
 
   return (
     <div className="rounded-2xl bg-white p-6 shadow">
-
       <div className="flex items-center justify-between">
-
         <h2 className="text-2xl font-bold">
           {order.serviceName}
         </h2>
 
         <div className="flex items-center gap-3">
-
           <span
             className={`rounded-full px-4 py-2 text-sm font-medium ${getStatusStyle(
               order.status
@@ -62,15 +58,16 @@ function OrderCard({
             {order.status}
           </span>
 
-         {order.paymentStatus && order.paymentStatus !== "0" && (
-  <span
-    className={`rounded-full px-4 py-2 text-sm font-medium ${getPaymentStyle(
-      order.paymentStatus
-    )}`}
-  >
-    {order.paymentStatus}
-  </span>
-)}
+          {order.paymentStatus && (
+            <span
+              className={`rounded-full px-4 py-2 text-sm font-medium ${getPaymentStyle(
+                order.paymentStatus
+              )}`}
+            >
+              {order.paymentStatus}
+            </span>
+          )}
+
           {order.status === "Pending" && (
             <button
               onClick={() => onCancel(order.id)}
@@ -80,12 +77,18 @@ function OrderCard({
             </button>
           )}
 
+          {order.status === "Completed" && (
+            <button
+              onClick={() => onReview(order)}
+              className="rounded-lg bg-yellow-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-yellow-600"
+            >
+              ⭐ Review
+            </button>
+          )}
         </div>
-
       </div>
 
       <div className="mt-5 space-y-2 text-slate-600">
-
         <p>
           <strong>Provider:</strong>{" "}
           {order.providerName || "-"}
@@ -105,9 +108,7 @@ function OrderCard({
           <strong>Total:</strong>{" "}
           {order.totalPrice} ₼
         </p>
-
       </div>
-
     </div>
   );
 }

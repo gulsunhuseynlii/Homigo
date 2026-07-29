@@ -4,6 +4,12 @@ import toast from "react-hot-toast";
 
 import { getServices } from "../services/serviceService";
 import { getRole, isAuthenticated } from "../utils/auth";
+import {
+  addFavorite,
+  removeFavorite,
+  getMyFavorites,
+} from "../services/favoriteService";
+import { FaHeart, FaRegHeart } from "react-icons/fa";
 
 function Services() {
   const [services, setServices] = useState([]);
@@ -16,9 +22,15 @@ function Services() {
 
   const categoryId = searchParams.get("categoryId");
 
-  useEffect(() => {
-    loadServices();
-  }, [categoryId]);
+  const [favorites, setFavorites] = useState([]);
+
+ useEffect(() => {
+  loadServices();
+
+  if (isAuthenticated() && role === "Customer") {
+    loadFavorites();
+  }
+}, [categoryId]);
 
   const loadServices = async () => {
     try {
@@ -31,7 +43,34 @@ function Services() {
       toast.error("Failed to load services.");
     }
   };
+const loadFavorites = async () => {
+  try {
+    const data = await getMyFavorites();
 
+    setFavorites(data.map((x) => x.serviceId));
+  } catch {}
+};
+const toggleFavorite = async (serviceId) => {
+  try {
+    if (favorites.includes(serviceId)) {
+      await removeFavorite(serviceId);
+
+      setFavorites((prev) =>
+        prev.filter((id) => id !== serviceId)
+      );
+
+      toast.success("Removed from favorites.");
+    } else {
+      await addFavorite(serviceId);
+
+      setFavorites((prev) => [...prev, serviceId]);
+
+      toast.success("Added to favorites.");
+    }
+  } catch {
+    toast.error("Operation failed.");
+  }
+};
   const handleChooseProvider = (serviceId) => {
     if (!isAuthenticated()) {
       toast("Please login to book a service.");
@@ -53,16 +92,33 @@ function Services() {
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {services.map((service) => (
-            <div
-              key={service.id}
-              className="rounded-2xl border border-slate-200 bg-white p-6 shadow transition hover:shadow-xl"
-            >
+           <div
+  key={service.id}
+  className="relative rounded-2xl border border-slate-200 bg-white p-6 shadow transition hover:shadow-xl"
+>
               {service.imageUrl && (
   <img
     src={`https://localhost:7121${service.imageUrl}`}
     alt={service.name}
     className="mb-4 h-52 w-full rounded-xl object-cover"
   />
+)}
+{role === "Customer" && (
+  <button
+    onClick={() => toggleFavorite(service.id)}
+    className="absolute right-4 top-4 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white shadow-md transition-all duration-200 hover:scale-110 hover:shadow-lg"
+    title={
+      favorites.includes(service.id)
+        ? "Remove from favorites"
+        : "Add to favorites"
+    }
+  >
+    {favorites.includes(service.id) ? (
+      <FaHeart className="text-xl text-red-500" />
+    ) : (
+      <FaRegHeart className="text-xl text-gray-500" />
+    )}
+  </button>
 )}
               <h2 className="text-2xl font-bold">
                 {service.name}

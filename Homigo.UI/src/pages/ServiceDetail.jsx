@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { getServiceById } from "../services/serviceService";
 import { getRole } from "../utils/auth";
 import Button from "../components/ui/Button";
+import { getServiceReviews } from "../services/reviewService";
 
 function ServiceDetail() {
   const { id } = useParams();
@@ -14,18 +15,24 @@ function ServiceDetail() {
 
   const [service, setService] = useState(null);
 
+const [reviews, setReviews] = useState([]);
   useEffect(() => {
     loadService();
   }, [id]);
 
   const loadService = async () => {
-    try {
-      const data = await getServiceById(id);
-      setService(data);
-    } catch {
-      toast.error("Failed to load service.");
-    }
-  };
+  try {
+    const data = await getServiceById(id);
+
+    setService(data);
+
+    const reviewData = await getServiceReviews(data.id);
+
+    setReviews(reviewData);
+  } catch {
+    toast.error("Failed to load service.");
+  }
+};
 
   if (!service) {
     return (
@@ -90,6 +97,60 @@ function ServiceDetail() {
             >
               Choose Provider
             </Button>
+            {/* Reviews */}
+
+<div className="mt-14">
+  <h2 className="mb-6 text-3xl font-bold">
+    Customer Reviews
+  </h2>
+
+  {reviews.length === 0 ? (
+    <div className="rounded-2xl bg-slate-100 p-8 text-center">
+      <p className="text-slate-500">
+        No reviews yet.
+      </p>
+    </div>
+  ) : (
+    <div className="space-y-5">
+
+      {reviews.map((review) => (
+
+        <div
+          key={review.id}
+          className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
+        >
+
+          <div className="flex items-center justify-between">
+
+            <div>
+              <h3 className="text-lg font-semibold">
+                {review.customerName}
+              </h3>
+
+              <p className="text-sm text-slate-500">
+                {new Date(
+                  review.createdAt
+                ).toLocaleDateString()}
+              </p>
+            </div>
+
+            <div className="text-yellow-500 text-xl">
+              {"⭐".repeat(review.rating)}
+            </div>
+
+          </div>
+
+          <p className="mt-4 text-slate-600">
+            {review.comment}
+          </p>
+
+        </div>
+
+      ))}
+
+    </div>
+  )}
+</div>
           </div>
         )}
 

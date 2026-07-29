@@ -27,6 +27,7 @@ import AdminProviders from "../pages/AdminProviders";
 import Payment from "../pages/Payment";
 import PaymentSuccess from "../pages/PaymentSuccess";
 import MyPayments from "../pages/MyPayments";
+import MyFavorites from "../pages/MyFavorites";
 
 function AppRoutes() {
   return (
@@ -211,6 +212,14 @@ function AppRoutes() {
   element={
     <ProtectedRoute roles={["Customer"]}>
       <MyPayments />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/favorites"
+  element={
+    <ProtectedRoute roles={["Customer"]}>
+      <MyFavorites />
     </ProtectedRoute>
   }
 />
