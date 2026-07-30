@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-
+import Pagination from "../components/common/Pagination";
 import {
   getPendingProviders,
   approveProvider,
@@ -9,15 +9,21 @@ import {
 
 function AdminProviderApplications() {
   const [applications, setApplications] = useState([]);
-
+const [page, setPage] = useState(1);
+const [totalPages, setTotalPages] = useState(1);
   useEffect(() => {
-    loadApplications();
-  }, []);
+  loadApplications();
+}, [page]);
 
   const loadApplications = async () => {
     try {
-      const data = await getPendingProviders();
-      setApplications(data);
+    const data = await getPendingProviders({
+  page,
+  pageSize: 5,
+});
+
+setApplications(data.items);
+setTotalPages(data.totalPages);
     } catch {
       toast.error("Failed to load applications.");
     }
@@ -185,7 +191,11 @@ const handleReject = async (userId) => {
 
         </div>
       )}
-
+<Pagination
+  page={page}
+  totalPages={totalPages}
+  onPageChange={setPage}
+/>
     </div>
   );
 }

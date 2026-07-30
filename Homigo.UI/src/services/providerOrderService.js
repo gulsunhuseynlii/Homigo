@@ -1,7 +1,9 @@
 import api from "../api/axios";
 
-export const getMyJobs = async () => {
-  const response = await api.get("/Order/my-provider-orders");
+export const getMyJobs = async (params) => {
+  const response = await api.get("/Order/my-provider-orders", {
+    params,
+  });
 
   return response.data;
 };

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-
+import Pagination from "../components/common/Pagination";
 import ProviderOrderCard from "../components/provider/ProviderOrderCard";
 
 import {
@@ -13,16 +13,22 @@ import {
 
 function ProviderOrders() {
   const [orders, setOrders] = useState([]);
+const [page, setPage] = useState(1);
+const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
-    loadOrders();
-  }, []);
+  loadOrders();
+}, [page]);
 
   const loadOrders = async () => {
     try {
-      const data = await getMyJobs();
+      const data = await getMyJobs({
+  page,
+  pageSize: 5,
+});
 
-      setOrders(data);
+setOrders(data.items);
+setTotalPages(data.totalPages);
     } catch {
       toast.error("Failed to load jobs.");
     }
@@ -109,7 +115,11 @@ const handleReject = async (id) => {
         </div>
 
       )}
-
+<Pagination
+  page={page}
+  totalPages={totalPages}
+  onPageChange={setPage}
+/>
     </div>
   );
 }

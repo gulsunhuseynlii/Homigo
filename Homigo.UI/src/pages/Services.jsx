@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import toast from "react-hot-toast";
-
+import Pagination from "../components/common/Pagination";
 import { getServices } from "../services/serviceService";
 import { getRole, isAuthenticated } from "../utils/auth";
 import {
@@ -21,8 +21,12 @@ function Services() {
   const role = getRole();
 
   const categoryId = searchParams.get("categoryId");
-
+useEffect(() => {
+  setPage(1);
+}, [categoryId]);
   const [favorites, setFavorites] = useState([]);
+  const [page, setPage] = useState(1);
+const [totalPages, setTotalPages] = useState(1);
 
  useEffect(() => {
   loadServices();
@@ -30,19 +34,22 @@ function Services() {
   if (isAuthenticated() && role === "Customer") {
     loadFavorites();
   }
-}, [categoryId]);
+}, [categoryId, page]);
 
-  const loadServices = async () => {
-    try {
-      const data = await getServices({
-        categoryId,
-      });
+ const loadServices = async () => {
+  try {
+    const data = await getServices({
+      categoryId,
+      page,
+      pageSize: 9,
+    });
 
-      setServices(data.items ?? data);
-    } catch {
-      toast.error("Failed to load services.");
-    }
-  };
+    setServices(data.items);
+    setTotalPages(data.totalPages);
+  } catch {
+    toast.error("Failed to load services.");
+  }
+};
 const loadFavorites = async () => {
   try {
     const data = await getMyFavorites();
@@ -158,7 +165,13 @@ const toggleFavorite = async (serviceId) => {
             </div>
           ))}
         </div>
-      )}
+            )}
+
+     <Pagination
+  page={page}
+  totalPages={totalPages}
+  onPageChange={setPage}
+/>
     </div>
   );
 }

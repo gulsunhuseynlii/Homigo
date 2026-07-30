@@ -28,8 +28,11 @@ export const applyProvider = async (formData) => {
   return response.data;
 };
 
-export const getPendingProviders = async () => {
-  const response = await api.get("/Provider/pending");
+export const getPendingProviders = async (params) => {
+  const response = await api.get("/Provider/pending", {
+    params,
+  });
+
   return response.data;
 };
 

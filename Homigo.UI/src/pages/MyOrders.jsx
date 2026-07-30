@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-
+import Pagination from "../components/common/Pagination";
 import {
   getMyOrders,
   cancelOrder,
@@ -11,16 +11,23 @@ import ReviewModal from "../components/review/ReviewModal";
 
 function MyOrders() {
   const [orders, setOrders] = useState([]);
+  const [page, setPage] = useState(1);
+const [totalPages, setTotalPages] = useState(1);
 const [selectedOrder, setSelectedOrder] = useState(null);
-  useEffect(() => {
-    loadOrders();
-  }, []);
+
+useEffect(() => {
+  loadOrders();
+}, [page]);
 
   const loadOrders = async () => {
     try {
-      const data = await getMyOrders();
+     const data = await getMyOrders({
+  page,
+  pageSize: 5,
+});
 
-      setOrders(data);
+setOrders(data.items);
+setTotalPages(data.totalPages);
     } catch {
       toast.error("Failed to load orders.");
     }
@@ -81,6 +88,11 @@ const [selectedOrder, setSelectedOrder] = useState(null);
     }}
   />
 )}
+<Pagination
+  page={page}
+  totalPages={totalPages}
+  onPageChange={setPage}
+/>
     </div>
   );
 }
