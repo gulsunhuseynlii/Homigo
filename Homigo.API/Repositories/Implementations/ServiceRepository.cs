@@ -17,7 +17,7 @@ public class ServiceRepository
         _context = context;
     }
 
-    public async Task<List<Service>> GetAllAsync(ServiceQueryDto query)
+    public async Task<(List<Service> Services, int TotalCount)> GetAllAsync(ServiceQueryDto query)
     {
         var services = _context.Services
             .Include(x => x.Provider)
@@ -53,10 +53,14 @@ public class ServiceRepository
             }
         }
 
-        return await services
+        var totalCount = await services.CountAsync();
+
+        var result = await services
             .Skip((query.Page - 1) * query.PageSize)
             .Take(query.PageSize)
             .ToListAsync();
+
+        return (result, totalCount);
     }
 
     public async Task<Service?> GetByIdAsync(int id)

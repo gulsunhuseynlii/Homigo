@@ -34,12 +34,15 @@ public class ProviderController : ControllerBase
 
     [Authorize(Roles = "Admin")]
     [HttpGet("pending")]
-    public async Task<IActionResult> GetPending()
+    public async Task<IActionResult> GetPending(
+     [FromQuery] ProviderQueryDto query)
     {
-        var result = await _providerService.GetPendingApplicationsAsync();
+        var result =
+            await _providerService.GetPendingApplicationsAsync(query);
 
         return Ok(result);
     }
+
     [Authorize(Roles = "Admin")]
     [HttpPut("approve/{userId}")]
     public async Task<IActionResult> Approve(int userId)

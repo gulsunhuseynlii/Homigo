@@ -5,7 +5,8 @@ namespace Homigo.API.Repositories.Interfaces;
 
 public interface IServiceRepository : IGenericRepository<Service>
 {
-    Task<List<Service>> GetAllAsync(ServiceQueryDto query);
+    Task<(List<Service> Services, int TotalCount)>
+     GetAllAsync(ServiceQueryDto query);
 
     Task<Service?> GetByIdAsync(int id);
 

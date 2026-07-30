@@ -1,10 +1,11 @@
-﻿using Homigo.API.DTOs.Service;
+﻿using Homigo.API.DTOs.Common;
+using Homigo.API.DTOs.Service;
 
 namespace Homigo.API.Interfaces;
 
 public interface IServiceService
 {
-    Task<List<ServiceDto>> GetAllAsync(ServiceQueryDto query);
+    Task<PagedResult<ServiceDto>> GetAllAsync(ServiceQueryDto query);
 
     Task<ServiceDto?> GetByIdAsync(int id);
 

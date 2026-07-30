@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Homigo.API.DTOs.Common;
 using Homigo.API.DTOs.Provider;
 using Homigo.API.Entities;
 using Homigo.API.Exceptions;
@@ -159,13 +160,21 @@ public class ProviderService : IProviderService
             userId);
     }
 
-    public async Task<List<ProviderApplicationDto>> GetPendingApplicationsAsync()
+    public async Task<PagedResult<ProviderApplicationDto>> GetPendingApplicationsAsync(
+      ProviderQueryDto query)
     {
         _logger.LogInformation("Getting pending provider applications.");
 
-        var providers = await _providerRepository.GetPendingAsync();
+        var (providers, totalCount) =
+            await _providerRepository.GetPendingAsync(query.Page, query.PageSize);
 
-        return _mapper.Map<List<ProviderApplicationDto>>(providers);
+        return new PagedResult<ProviderApplicationDto>
+        {
+            Items = _mapper.Map<List<ProviderApplicationDto>>(providers),
+            TotalCount = totalCount,
+            Page = query.Page,
+            PageSize = query.PageSize
+        };
     }
 
     public async Task ApproveAsync(int userId)
@@ -254,14 +263,17 @@ public class ProviderService : IProviderService
 
     public async Task<List<ProviderDto>> GetAllAsync(int? serviceId)
     {
-        _logger.LogInformation(
-            "Getting approved providers. ServiceId: {ServiceId}",
-            serviceId);
+        var providers = await _providerRepository.GetApprovedProvidersAsync(serviceId);
 
-        var providers =
-            await _providerRepository.GetApprovedProvidersAsync(serviceId);
+        var result = _mapper.Map<List<ProviderDto>>(providers);
 
-        return _mapper.Map<List<ProviderDto>>(providers);
+        foreach (var provider in result)
+        {
+            provider.AverageRating =
+                await _providerRepository.GetAverageRatingAsync(provider.UserId);
+        }
+
+        return result;
     }
     public async Task RejectAsync(int userId)
     {

@@ -49,12 +49,8 @@ public class MappingProfile : Profile
      .ForMember(x => x.CategoryName,
          opt => opt.MapFrom(x => x.Category.Name))
      .ForMember(x => x.Experience,
-         opt => opt.MapFrom(x => $"{x.YearsOfExperience} years"))
-     .ForMember(x => x.AverageRating,
-         opt => opt.MapFrom(x =>
-             x.Reviews.Any()
-                 ? x.Reviews.Average(r => r.Rating)
-                 : 0));
+         opt => opt.MapFrom(x => $"{x.YearsOfExperience} years"));
+     
 
         CreateMap<ProviderProfile, ProviderApplicationDto>()
             .ForMember(x => x.UserId,

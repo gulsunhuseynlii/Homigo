@@ -22,13 +22,21 @@ public class ProviderRepository
             .FirstOrDefaultAsync(x => x.UserId == userId);
     }
 
-    public async Task<List<ProviderProfile>> GetPendingAsync()
+    public async Task<(List<ProviderProfile> Providers, int TotalCount)> GetPendingAsync(int page, int pageSize)
     {
-        return await _context.ProviderProfiles
+        var query = _context.ProviderProfiles
             .Include(x => x.User)
             .Include(x => x.Category)
-            .Where(x => !x.IsApproved && !x.IsDeleted)
+            .Where(x => !x.IsApproved && !x.IsDeleted);
+
+        var totalCount = await query.CountAsync();
+
+        var providers = await query
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
             .ToListAsync();
+
+        return (providers, totalCount);
     }
 
     public async Task<User?> GetUserWithRoleAsync(int userId)
@@ -92,5 +100,11 @@ public class ProviderRepository
         }
 
         return await query.ToListAsync();
+    }
+    public async Task<double> GetAverageRatingAsync(int providerUserId)
+    {
+        return await _context.Reviews
+            .Where(r => r.ProviderId == providerUserId)
+            .AverageAsync(r => (double?)r.Rating) ?? 0;
     }
 }

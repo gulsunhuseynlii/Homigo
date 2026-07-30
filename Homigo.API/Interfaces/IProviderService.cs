@@ -1,11 +1,13 @@
-﻿using Homigo.API.DTOs.Provider;
+﻿using Homigo.API.DTOs.Common;
+using Homigo.API.DTOs.Provider;
 
 namespace Homigo.API.Interfaces;
 
 public interface IProviderService
 {
     Task ApplyAsync(int userId, ApplyProviderDto dto);
-    Task<List<ProviderApplicationDto>> GetPendingApplicationsAsync();
+    Task<PagedResult<ProviderApplicationDto>>
+     GetPendingApplicationsAsync(ProviderQueryDto query);
 
     Task ApproveAsync(int userId);
     Task<List<ProviderDto>> GetAllAsync();

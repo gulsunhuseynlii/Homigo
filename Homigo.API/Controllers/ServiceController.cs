@@ -16,7 +16,6 @@ public class ServiceController : ControllerBase
     {
         _serviceService = serviceService;
     }
-
     [HttpGet]
     public async Task<IActionResult> GetAll([FromQuery] ServiceQueryDto query)
     {

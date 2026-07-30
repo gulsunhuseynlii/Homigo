@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Homigo.API.DTOs.Common;
 using Homigo.API.DTOs.Service;
 using Homigo.API.Entities;
 using Homigo.API.Exceptions;
@@ -27,13 +28,19 @@ public class ServiceService : IServiceService
         _fileService = fileService;
     }
 
-    public async Task<List<ServiceDto>> GetAllAsync(ServiceQueryDto query)
+    public async Task<PagedResult<ServiceDto>> GetAllAsync(ServiceQueryDto query)
     {
         _logger.LogInformation("Getting services.");
 
-        var services = await _serviceRepository.GetAllAsync(query);
+        var (services, totalCount) = await _serviceRepository.GetAllAsync(query);
 
-        return _mapper.Map<List<ServiceDto>>(services);
+        return new PagedResult<ServiceDto>
+        {
+            Items = _mapper.Map<List<ServiceDto>>(services),
+            TotalCount = totalCount,
+            Page = query.Page,
+            PageSize = query.PageSize
+        };
     }
 
     public async Task<ServiceDto?> GetByIdAsync(int id)
