@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Homigo.API.DTOs.Common;
 using Homigo.API.DTOs.Order;
 using Homigo.API.Entities;
 using Homigo.API.Enums;
@@ -82,15 +83,27 @@ public class OrderService : IOrderService
         return order.Id;
     }
 
-    public async Task<List<OrderDto>> GetMyOrdersAsync(int userId)
+    public async Task<PagedResult<OrderDto>> GetMyOrdersAsync(
+    int userId,
+    OrderQueryDto query)
     {
         _logger.LogInformation(
             "Customer {UserId} requested own orders.",
             userId);
 
-        var orders = await _orderRepository.GetCustomerOrdersAsync(userId);
+        var (orders, totalCount) =
+            await _orderRepository.GetCustomerOrdersAsync(
+                userId,
+                query.Page,
+                query.PageSize);
 
-        return _mapper.Map<List<OrderDto>>(orders);
+        return new PagedResult<OrderDto>
+        {
+            Items = _mapper.Map<List<OrderDto>>(orders),
+            TotalCount = totalCount,
+            Page = query.Page,
+            PageSize = query.PageSize
+        };
     }
 
     public async Task AcceptOrderAsync(int orderId, int providerUserId)
@@ -121,15 +134,27 @@ public class OrderService : IOrderService
             orderId);
     }
 
-    public async Task<List<OrderDto>> GetMyProviderOrdersAsync(int providerUserId)
+    public async Task<PagedResult<OrderDto>> GetMyProviderOrdersAsync(
+     int providerUserId,
+     OrderQueryDto query)
     {
         _logger.LogInformation(
             "Provider {ProviderId} requested own orders.",
             providerUserId);
 
-        var orders = await _orderRepository.GetProviderOrdersAsync(providerUserId);
+        var (orders, totalCount) =
+            await _orderRepository.GetProviderOrdersAsync(
+                providerUserId,
+                query.Page,
+                query.PageSize);
 
-        return _mapper.Map<List<OrderDto>>(orders);
+        return new PagedResult<OrderDto>
+        {
+            Items = _mapper.Map<List<OrderDto>>(orders),
+            TotalCount = totalCount,
+            Page = query.Page,
+            PageSize = query.PageSize
+        };
     }
 
     public async Task StartOrderAsync(int orderId, int providerUserId)

@@ -42,28 +42,48 @@ public class OrderRepository : GenericRepository<Order>, IOrderRepository
                 x.IsApproved);
     }
 
-    public async Task<List<Order>> GetCustomerOrdersAsync(int userId)
+    public async Task<(List<Order> Orders, int TotalCount)> GetCustomerOrdersAsync(
+      int userId,
+      int page,
+      int pageSize)
     {
-        return await _context.Orders
+        var query = _context.Orders
             .Include(x => x.Service)
             .Include(x => x.Address)
             .Include(x => x.Provider)
-            .Where(x =>
-                x.CustomerId == userId &&
-                !x.IsDeleted)
+            .Where(x => x.CustomerId == userId && !x.IsDeleted);
+
+        var totalCount = await query.CountAsync();
+
+        var orders = await query
+            .OrderByDescending(x => x.Id)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
             .ToListAsync();
+
+        return (orders, totalCount);
     }
 
-    public async Task<List<Order>> GetProviderOrdersAsync(int providerUserId)
+    public async Task<(List<Order> Orders, int TotalCount)> GetProviderOrdersAsync(
+     int providerUserId,
+     int page,
+     int pageSize)
     {
-        return await _context.Orders
+        var query = _context.Orders
             .Include(x => x.Customer)
             .Include(x => x.Service)
             .Include(x => x.Address)
-            .Where(x =>
-                x.ProviderId == providerUserId &&
-                !x.IsDeleted)
+            .Where(x => x.ProviderId == providerUserId && !x.IsDeleted);
+
+        var totalCount = await query.CountAsync();
+
+        var orders = await query
+            .OrderByDescending(x => x.Id)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
             .ToListAsync();
+
+        return (orders, totalCount);
     }
 
     public async Task<Order?> GetOrderByIdAsync(int id)

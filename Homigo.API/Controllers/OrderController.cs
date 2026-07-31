@@ -35,26 +35,34 @@ public class OrderController : ControllerBase
     }
     [Authorize(Roles = "Customer")]
     [HttpGet("my-orders")]
-    public async Task<IActionResult> GetMyOrders()
+    public async Task<IActionResult> GetMyOrders(
+    [FromQuery] OrderQueryDto query)
     {
-        var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var userId =
+            int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-        var result = await _orderService.GetMyOrdersAsync(userId);
+        var result =
+            await _orderService.GetMyOrdersAsync(userId, query);
 
         return Ok(result);
     }
 
     [Authorize(Roles = "Provider")]
     [HttpGet("my-provider-orders")]
-    public async Task<IActionResult> GetMyProviderOrders()
+    public async Task<IActionResult> GetMyProviderOrders(
+    [FromQuery] OrderQueryDto query)
     {
         var providerUserId =
             int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-        var result = await _orderService.GetMyProviderOrdersAsync(providerUserId);
+        var result =
+            await _orderService.GetMyProviderOrdersAsync(
+                providerUserId,
+                query);
 
         return Ok(result);
     }
+
     [Authorize(Roles = "Provider")]
     [HttpPut("start/{id}")]
     public async Task<IActionResult> Start(int id)

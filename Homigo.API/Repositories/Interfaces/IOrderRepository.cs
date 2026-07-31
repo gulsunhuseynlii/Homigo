@@ -10,9 +10,15 @@ public interface IOrderRepository : IGenericRepository<Order>
 
     Task<ProviderProfile?> GetApprovedProviderAsync(int providerUserId);
 
-    Task<List<Order>> GetCustomerOrdersAsync(int userId);
+    Task<(List<Order> Orders, int TotalCount)> GetCustomerOrdersAsync(
+    int userId,
+    int page,
+    int pageSize);
 
-    Task<List<Order>> GetProviderOrdersAsync(int providerUserId);
+    Task<(List<Order> Orders, int TotalCount)> GetProviderOrdersAsync(
+        int providerUserId,
+        int page,
+        int pageSize);
 
     Task<Order?> GetOrderByIdAsync(int id);
 

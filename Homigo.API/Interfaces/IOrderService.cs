@@ -1,4 +1,5 @@
-﻿using Homigo.API.DTOs.Order;
+﻿using Homigo.API.DTOs.Common;
+using Homigo.API.DTOs.Order;
 
 namespace Homigo.API.Interfaces;
 
@@ -6,12 +7,15 @@ public interface IOrderService
 {
     Task<int> CreateAsync(int userId, CreateOrderDto dto);
 
-    Task<List<OrderDto>> GetMyOrdersAsync(int userId);
+    Task<PagedResult<OrderDto>> GetMyOrdersAsync(
+    int userId,
+    OrderQueryDto query);
 
     Task AcceptOrderAsync(int orderId, int providerUserId);
 
-    Task<List<OrderDto>> GetMyProviderOrdersAsync(int providerUserId);
-
+    Task<PagedResult<OrderDto>> GetMyProviderOrdersAsync(
+    int providerUserId,
+    OrderQueryDto query);
     Task StartOrderAsync(int orderId, int providerUserId);
 
     Task CompleteOrderAsync(int orderId, int providerUserId);
