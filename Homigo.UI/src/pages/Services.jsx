@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import Pagination from "../components/common/Pagination";
+import Spinner from "../components/common/Spinner";
 import { getServices } from "../services/serviceService";
 import { getRole, isAuthenticated } from "../utils/auth";
 import {
@@ -15,7 +16,7 @@ function Services() {
   const [services, setServices] = useState([]);
 
   const [searchParams] = useSearchParams();
-
+const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   const role = getRole();
@@ -38,6 +39,8 @@ const [totalPages, setTotalPages] = useState(1);
 
  const loadServices = async () => {
   try {
+    setLoading(true);
+
     const data = await getServices({
       categoryId,
       page,
@@ -48,6 +51,8 @@ const [totalPages, setTotalPages] = useState(1);
     setTotalPages(data.totalPages);
   } catch {
     toast.error("Failed to load services.");
+  } finally {
+    setLoading(false);
   }
 };
 const loadFavorites = async () => {
@@ -78,15 +83,19 @@ const toggleFavorite = async (serviceId) => {
     toast.error("Operation failed.");
   }
 };
-  const handleChooseProvider = (serviceId) => {
-    if (!isAuthenticated()) {
-      toast("Please login to book a service.");
-      navigate("/login");
-      return;
-    }
+const handleChooseProvider = (serviceId) => {
+  if (!isAuthenticated()) {
+    toast("Please login to book a service.");
+    navigate("/login");
+    return;
+  }
 
-    navigate(`/providers?serviceId=${serviceId}`);
-  };
+  navigate(`/providers?serviceId=${serviceId}`);
+};
+
+if (loading) {
+  return <Spinner />;
+}
 
   return (
     <div className="mx-auto max-w-7xl px-6 py-10">

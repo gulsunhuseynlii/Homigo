@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-
+import Spinner from "../../components/common/Spinner";
 import { getCategories } from "../../services/categoryService";
 import { getMyOrders } from "../../services/orderService";
 import CategoryCard from "../../components/category/CategoryCard";
@@ -9,27 +9,35 @@ import CategoryCard from "../../components/category/CategoryCard";
 function CustomerHome() {
   const navigate = useNavigate();
 
-  const [categories, setCategories] = useState([]);
-  const [orders, setOrders] = useState([]);
+ const [categories, setCategories] = useState([]);
+const [orders, setOrders] = useState([]);
+const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     loadData();
   }, []);
 
-  const loadData = async () => {
-    try {
-      const [categoriesData, ordersData] =
-        await Promise.all([
-          getCategories(),
-          getMyOrders(),
-        ]);
+ const loadData = async () => {
+  try {
+    setLoading(true);
 
-      setCategories(categoriesData);
-      setOrders(ordersData);
-    } catch {
-      toast.error("Failed to load dashboard.");
-    }
-  };
+    const [categoriesData, ordersData] =
+      await Promise.all([
+        getCategories(),
+        getMyOrders({
+          page: 1,
+          pageSize: 5,
+        }),
+      ]);
+
+    setCategories(categoriesData);
+    setOrders(ordersData.items);
+  } catch {
+    toast.error("Failed to load dashboard.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   const pendingOrders = orders.filter(
     (x) => x.status === "Pending"
@@ -38,7 +46,9 @@ function CustomerHome() {
   const completedOrders = orders.filter(
     (x) => x.status === "Completed"
   ).length;
-
+if (loading) {
+  return <Spinner />;
+}
   return (
     <div className="mx-auto max-w-7xl px-6 py-10">
 
@@ -184,11 +194,26 @@ function CustomerHome() {
 
         </div>
 
-        {orders.length === 0 ? (
-          <div className="rounded-2xl bg-slate-100 py-12 text-center text-slate-500">
-            No orders yet.
-          </div>
-        ) : (
+      {orders.length === 0 ? (
+  <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-12 text-center">
+    <div className="mb-4 text-6xl">📦</div>
+
+    <h2 className="text-2xl font-bold text-slate-800">
+      No recent orders
+    </h2>
+
+    <p className="mt-2 text-slate-500">
+      Your recent bookings will appear here.
+    </p>
+
+    <button
+      onClick={() => navigate("/services")}
+      className="mt-6 rounded-xl bg-blue-600 px-6 py-3 text-white hover:bg-blue-700"
+    >
+      Browse Services
+    </button>
+  </div>
+) : (
           <div className="space-y-4">
 
             {orders.slice(0, 5).map((order) => (

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import Pagination from "../components/common/Pagination";
+import Spinner from "../components/common/Spinner";
 import ProviderOrderCard from "../components/provider/ProviderOrderCard";
 
 import {
@@ -13,6 +14,7 @@ import {
 
 function ProviderOrders() {
   const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
 const [page, setPage] = useState(1);
 const [totalPages, setTotalPages] = useState(1);
 
@@ -21,18 +23,22 @@ const [totalPages, setTotalPages] = useState(1);
 }, [page]);
 
   const loadOrders = async () => {
-    try {
-      const data = await getMyJobs({
-  page,
-  pageSize: 5,
-});
+  try {
+    setLoading(true);
 
-setOrders(data.items);
-setTotalPages(data.totalPages);
-    } catch {
-      toast.error("Failed to load jobs.");
-    }
-  };
+    const data = await getMyJobs({
+      page,
+      pageSize: 5,
+    });
+
+    setOrders(data.items);
+    setTotalPages(data.totalPages);
+  } catch {
+    toast.error("Failed to load jobs.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleAccept = async (id) => {
     try {
@@ -79,7 +85,9 @@ const handleReject = async (id) => {
       toast.error("Failed to complete order.");
     }
   };
-
+if (loading) {
+  return <Spinner />;
+}
   return (
     <div className="mx-auto max-w-6xl px-6 py-10">
 
@@ -88,16 +96,18 @@ const handleReject = async (id) => {
       </h1>
 
       {orders.length === 0 ? (
+  <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-12 text-center">
+    <div className="mb-4 text-6xl">🛠️</div>
 
-        <div className="rounded-2xl bg-slate-100 p-10 text-center">
+    <h2 className="text-2xl font-bold text-slate-800">
+      No jobs yet
+    </h2>
 
-          <h2 className="text-2xl font-semibold">
-            No jobs yet.
-          </h2>
-
-        </div>
-
-      ) : (
+    <p className="mt-2 text-slate-500">
+      New customer requests will appear here.
+    </p>
+  </div>
+) : (
 
         <div className="space-y-6">
 

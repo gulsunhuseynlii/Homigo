@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
-
+import Spinner from "../../components/common/Spinner";
 import { getMyServices } from "../../services/providerService";
 import { getMyProviderOrders } from "../../services/orderService";
 
@@ -15,28 +15,29 @@ function ProviderHome() {
   }, []);
 
   const loadData = async () => {
-    try {
-      const [servicesData, ordersData] = await Promise.all([
-        getMyServices(),
-        getMyProviderOrders(),
-      ]);
+  try {
+    setLoading(true);
 
-      setServices(servicesData);
-      setOrders(ordersData);
-    } catch {
-      toast.error("Failed to load dashboard.");
-    } finally {
-      setLoading(false);
-    }
-  };
+    const [servicesData, ordersData] = await Promise.all([
+      getMyServices(),
+      getMyProviderOrders({
+        page: 1,
+        pageSize: 5,
+      }),
+    ]);
+
+    setServices(servicesData);
+    setOrders(ordersData.items);
+  } catch {
+    toast.error("Failed to load dashboard.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   if (loading) {
-    return (
-      <div className="py-20 text-center text-xl">
-        Loading...
-      </div>
-    );
-  }
+  return <Spinner />;
+}
 
   const pendingOrders = orders.filter(
     (x) => x.status === "Pending"
@@ -126,11 +127,26 @@ function ProviderHome() {
 
         </div>
 
-        {orders.length === 0 ? (
-          <div className="rounded-xl bg-slate-100 py-12 text-center text-slate-500">
-            No orders yet.
-          </div>
-        ) : (
+  {orders.length === 0 ? (
+  <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-12 text-center">
+    <div className="mb-4 text-6xl">🛠️</div>
+
+    <h2 className="text-2xl font-bold text-slate-800">
+      No jobs yet
+    </h2>
+
+    <p className="mt-2 text-slate-500">
+      New customer bookings will appear here once they choose your services.
+    </p>
+
+    <Link
+      to="/provider/services"
+      className="mt-6 inline-block rounded-xl bg-blue-600 px-6 py-3 text-white hover:bg-blue-700"
+    >
+      Manage My Services
+    </Link>
+  </div>
+) : (
           <div className="space-y-4">
 
             {orders.slice(0, 5).map((order) => (
