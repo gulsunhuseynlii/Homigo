@@ -29,8 +29,11 @@ public class ServiceRepository
 
         if (!string.IsNullOrWhiteSpace(query.Search))
         {
+            var search = query.Search.Trim().ToLower();
+
             services = services.Where(x =>
-                x.Name.ToLower().Contains(query.Search.ToLower()));
+                x.Name.ToLower().Contains(search) ||
+                x.Description.ToLower().Contains(search));
         }
 
         if (query.CategoryId.HasValue)
