@@ -23,4 +23,6 @@ public interface IOrderService
     Task CancelOrderAsync(int orderId, int customerId);
 
     Task RejectOrderAsync(int orderId, int providerUserId);
+    Task AutoCancelExpiredOrdersAsync();
+    Task SendAppointmentRemindersAsync();
 }

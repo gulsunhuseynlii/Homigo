@@ -1,4 +1,6 @@
-﻿namespace Homigo.API.DTOs.Order;
+﻿using Homigo.API.DTOs.Address;
+
+namespace Homigo.API.DTOs.Order;
 
 public class OrderDto
 {
@@ -6,7 +8,7 @@ public class OrderDto
 
     public string ServiceName { get; set; } = string.Empty;
 
-    public string AddressTitle { get; set; } = string.Empty;
+    public AddressDto Address { get; set; } = null!;
 
     public decimal TotalPrice { get; set; }
 

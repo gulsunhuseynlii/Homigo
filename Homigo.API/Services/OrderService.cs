@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Hangfire;
 using Homigo.API.DTOs.Common;
 using Homigo.API.DTOs.Order;
 using Homigo.API.Entities;
@@ -17,19 +18,22 @@ public class OrderService : IOrderService
     private readonly IMapper _mapper;
     private readonly IPaymentRepository _paymentRepository;
     private readonly IPaymentService _paymentService;
+    private readonly IEmailService _emailService;
 
     public OrderService(
      IOrderRepository orderRepository,
      IPaymentRepository paymentRepository,
       IPaymentService paymentService,
      IMapper mapper,
-     ILogger<OrderService> logger)
+     ILogger<OrderService> logger,
+     IEmailService emailService)
     {
         _orderRepository = orderRepository;
         _paymentRepository = paymentRepository;
         _paymentService = paymentService;
         _mapper = mapper;
         _logger = logger;
+        _emailService = emailService;
     }
 
     public async Task<int> CreateAsync(
@@ -129,6 +133,11 @@ public class OrderService : IOrderService
         await _orderRepository.UpdateAsync(order);
         await _orderRepository.SaveChangesAsync();
 
+        BackgroundJob.Enqueue<IEmailService>(x =>
+            x.SendOrderAcceptedEmailAsync(
+                order.Customer.Email,
+                order.Customer.FullName));
+
         _logger.LogInformation(
             "Order {OrderId} accepted successfully.",
             orderId);
@@ -210,6 +219,11 @@ public class OrderService : IOrderService
         await _orderRepository.UpdateAsync(order);
         await _orderRepository.SaveChangesAsync();
 
+        Hangfire.BackgroundJob.Enqueue<IEmailService>(x =>
+            x.SendOrderCompletedEmailAsync(
+                order.Customer.Email,
+                order.Customer.FullName));
+
         _logger.LogInformation(
             "Order {OrderId} completed successfully.",
             orderId);
@@ -279,5 +293,57 @@ public class OrderService : IOrderService
         _logger.LogInformation(
             "Order {OrderId} rejected successfully.",
             orderId);
+    }
+
+    public async Task AutoCancelExpiredOrdersAsync()
+    {
+        _logger.LogInformation("Checking expired pending orders...");
+
+        var orders = await _orderRepository.GetExpiredPendingOrdersAsync();
+
+        foreach (var order in orders)
+        {
+            order.Status = OrderStatus.Cancelled;
+
+            if (order.PaymentStatus == PaymentStatus.Paid)
+            {
+                await _paymentService.RefundPaymentAsync(order.Id);
+            }
+
+            await _orderRepository.UpdateAsync(order);
+        }
+
+        await _orderRepository.SaveChangesAsync();
+
+        _logger.LogInformation(
+            "{Count} expired orders cancelled.",
+            orders.Count);
+    }
+    public async Task SendAppointmentRemindersAsync()
+    {
+        _logger.LogInformation("Checking appointment reminders...");
+
+        var orders = await _orderRepository.GetOrdersForReminderAsync();
+
+        _logger.LogInformation("Found {Count} orders for reminder.", orders.Count);
+
+        foreach (var order in orders)
+        {
+            await _emailService.SendAppointmentReminderEmailAsync(
+                order.Customer.Email,
+                order.Customer.FullName,
+                order.Service.Name,
+                order.ScheduledDate);
+
+            order.ReminderEmailSent = true;
+
+            await _orderRepository.UpdateAsync(order);
+        }
+
+        await _orderRepository.SaveChangesAsync();
+
+        _logger.LogInformation(
+            "{Count} reminder emails sent.",
+            orders.Count);
     }
 }

@@ -28,4 +28,5 @@ public class Order : BaseEntity
     public PaymentStatus PaymentStatus { get; set; } = PaymentStatus.Unpaid;
     public Review? Review { get; set; }
     public Payment? Payment { get; set; }
+    public bool ReminderEmailSent { get; set; } = false;
 }

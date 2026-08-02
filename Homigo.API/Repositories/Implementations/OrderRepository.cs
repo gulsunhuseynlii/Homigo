@@ -89,8 +89,33 @@ public class OrderRepository : GenericRepository<Order>, IOrderRepository
     public async Task<Order?> GetOrderByIdAsync(int id)
     {
         return await _context.Orders
-            .FirstOrDefaultAsync(x =>
-                x.Id == id &&
-                !x.IsDeleted);
+    .Include(x => x.Customer)
+    .Include(x => x.Service)
+    .Include(x => x.Address)
+    .FirstOrDefaultAsync(x => x.Id == id);
+    }
+    public async Task<List<Order>> GetExpiredPendingOrdersAsync()
+    {
+        return await _context.Orders
+            .Where(x =>
+                x.Status == OrderStatus.Pending &&
+                x.CreatedAt <= DateTime.UtcNow.AddMinutes(-30))
+            .ToListAsync();
+    }
+    public async Task<List<Order>> GetOrdersForReminderAsync()
+    {
+        var now = DateTime.Now;
+
+        var tomorrow = now.AddMinutes(5);
+
+        return await _context.Orders
+            .Include(x => x.Customer)
+            .Include(x => x.Service)
+            .Where(x =>
+                x.Status == OrderStatus.Accepted &&
+                !x.ReminderEmailSent &&
+                x.ScheduledDate >= now &&
+                x.ScheduledDate <= tomorrow)
+            .ToListAsync();
     }
 }

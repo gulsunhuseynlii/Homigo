@@ -1,8 +1,11 @@
 
 using FluentValidation.AspNetCore;
+using Hangfire;
+using Hangfire.SqlServer;
 using Homigo.API.Configurations;
 using Homigo.API.Data;
 using Homigo.API.Interfaces;
+using Homigo.API.Jobs;
 using Homigo.API.Mappings;
 using Homigo.API.Middlewares;
 using Homigo.API.Repositories.Implementations;
@@ -54,6 +57,9 @@ namespace Homigo.API
             builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
             builder.Services.AddScoped<IFavoriteRepository, FavoriteRepository>();
 
+            builder.Services.AddScoped<ExpiredOrderJob>();
+            builder.Services.AddScoped<AppointmentReminderJob>();
+
             builder.Services.AddSwaggerGen(options =>
             {
                 options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
@@ -86,6 +92,28 @@ namespace Homigo.API
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
             });
+
+
+            builder.Services.AddHangfire(config =>
+            {
+                config.SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+                      .UseSimpleAssemblyNameTypeSerializer()
+                      .UseRecommendedSerializerSettings()
+                      .UseSqlServerStorage(
+                          builder.Configuration.GetConnectionString("DefaultConnection"),
+                          new SqlServerStorageOptions
+                          {
+                              CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
+                              SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
+                              QueuePollInterval = TimeSpan.Zero,
+                              UseRecommendedIsolationLevel = true,
+                              DisableGlobalLocks = true
+                          });
+            });
+
+            builder.Services.AddHangfireServer();
+
+
             builder.Services.Configure<JwtSettings>(
             builder.Configuration.GetSection("Jwt"));
 
@@ -122,6 +150,9 @@ namespace Homigo.API
             Stripe.StripeConfiguration.ApiKey =
     builder.Configuration["Stripe:SecretKey"];
             var app = builder.Build();
+
+
+
             using (var scope = app.Services.CreateScope())
             {
                 var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -143,6 +174,16 @@ namespace Homigo.API
             app.UseAuthentication();
             app.UseAuthorization();
 
+            app.UseHangfireDashboard("/hangfire");
+
+            RecurringJob.AddOrUpdate<ExpiredOrderJob>(
+"expired-orders",
+job => job.ExecuteAsync(),
+"*/5 * * * *");
+            RecurringJob.AddOrUpdate<AppointmentReminderJob>(
+    "appointment-reminders",
+    job => job.ExecuteAsync(),
+    "*/30 * * * *");
             app.MapControllers();
 
             app.Run();

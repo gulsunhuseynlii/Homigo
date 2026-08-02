@@ -73,20 +73,17 @@ public class MappingProfile : Profile
         // -------------------- ORDER --------------------
 
         CreateMap<Order, OrderDto>()
-            .ForMember(x => x.ServiceName,
-                opt => opt.MapFrom(x => x.Service.Name))
-            .ForMember(x => x.AddressTitle,
-                opt => opt.MapFrom(x => x.Address.Title))
-            .ForMember(x => x.ProviderName,
-                opt => opt.MapFrom(x =>
-                    x.Provider == null ? null : x.Provider.FullName))
-            .ForMember(x => x.Status,
-                opt => opt.MapFrom(x => x.Status.ToString()))
-            .ForMember(
-    dest => dest.PaymentStatus,
-    opt => opt.MapFrom(src => src.PaymentStatus.ToString()))
-            .ForMember(x => x.CustomerName,
-                opt => opt.MapFrom(x => x.Customer.FullName));
+      .ForMember(x => x.ServiceName,
+          opt => opt.MapFrom(x => x.Service.Name))
+      .ForMember(x => x.ProviderName,
+          opt => opt.MapFrom(x =>
+              x.Provider == null ? null : x.Provider.FullName))
+      .ForMember(x => x.Status,
+          opt => opt.MapFrom(x => x.Status.ToString()))
+      .ForMember(x => x.PaymentStatus,
+          opt => opt.MapFrom(x => x.PaymentStatus.ToString()))
+      .ForMember(x => x.CustomerName,
+          opt => opt.MapFrom(x => x.Customer.FullName));
 
         // -------------------- PAYMENT --------------------
 

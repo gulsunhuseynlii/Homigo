@@ -21,5 +21,6 @@ public interface IOrderRepository : IGenericRepository<Order>
         int pageSize);
 
     Task<Order?> GetOrderByIdAsync(int id);
-
+    Task<List<Order>> GetExpiredPendingOrdersAsync();
+    Task<List<Order>> GetOrdersForReminderAsync();
 }

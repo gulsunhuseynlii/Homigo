@@ -57,9 +57,25 @@ function ProviderOrderCard({
           <strong>Customer:</strong> {order.customerName}
         </p>
 
-        <p>
-          <strong>Address:</strong> {order.addressTitle}
-        </p>
+        <div>
+  <strong>Address:</strong>
+
+  <p>
+    {order.address.city}, {order.address.district}
+  </p>
+
+  <p>
+    {order.address.street}, Building {order.address.building}
+  </p>
+
+  <p>
+    Apartment {order.address.apartment}
+  </p>
+
+  <p className="text-sm text-gray-500">
+    ({order.address.title})
+  </p>
+</div>
 
         <p>
           <strong>Date:</strong>{" "}

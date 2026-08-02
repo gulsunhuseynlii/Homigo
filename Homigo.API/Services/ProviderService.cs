@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Hangfire;
 using Homigo.API.DTOs.Common;
 using Homigo.API.DTOs.Provider;
 using Homigo.API.Entities;
@@ -6,6 +7,7 @@ using Homigo.API.Exceptions;
 using Homigo.API.Interfaces;
 using Homigo.API.Repositories.Interfaces;
 using Microsoft.Extensions.Logging;
+using Stripe;
 
 namespace Homigo.API.Services;
 
@@ -15,17 +17,19 @@ public class ProviderService : IProviderService
     private readonly IMapper _mapper;
     private readonly ILogger<ProviderService> _logger;
     private readonly IFileService _fileService;
-
+    private readonly IEmailService _emailService;
     public ProviderService(
      IProviderRepository providerRepository,
      ILogger<ProviderService> logger,
      IMapper mapper,
-     IFileService fileService)
+      IFileService fileService,
+     IEmailService emailService)
     {
         _providerRepository = providerRepository;
         _logger = logger;
         _mapper = mapper;
         _fileService = fileService;
+        _emailService = emailService;
     }
 
     public async Task ApplyAsync(int userId, ApplyProviderDto dto)
@@ -55,7 +59,7 @@ public class ProviderService : IProviderService
             if (!provider.IsDeleted)
                 throw new BadRequestException("You have already applied.");
 
-            // Reject olunmuş müraciəti yenidən aktiv edirik
+            
             provider.IsDeleted = false;
             provider.IsApproved = false;
 
@@ -202,6 +206,11 @@ public class ProviderService : IProviderService
         user.RoleId = providerRole.Id;
 
         await _providerRepository.SaveChangesAsync();
+
+        BackgroundJob.Enqueue<IEmailService>(x =>
+            x.SendProviderApprovedEmailAsync(
+                user.Email,
+                user.FullName));
 
         _logger.LogInformation(
             "Provider approved successfully. UserId: {UserId}",
