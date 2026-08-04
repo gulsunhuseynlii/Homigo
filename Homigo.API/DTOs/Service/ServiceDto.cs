@@ -19,4 +19,7 @@ public class ServiceDto
     public string ProviderName { get; set; } = string.Empty;
 
     public string CategoryName { get; set; } = string.Empty;
+    public double AverageRating { get; set; }
+
+    public int ReviewCount { get; set; }
 }

@@ -20,12 +20,14 @@ public class ServiceRepository
     public async Task<(List<Service> Services, int TotalCount)> GetAllAsync(ServiceQueryDto query)
     {
         var services = _context.Services
-            .Include(x => x.Provider)
-                .ThenInclude(x => x.User)
-            .Include(x => x.Provider)
-                .ThenInclude(x => x.Category)
-            .Where(x => !x.IsDeleted)
-            .AsQueryable();
+    .Include(x => x.Provider)
+        .ThenInclude(x => x.User)
+    .Include(x => x.Provider)
+        .ThenInclude(x => x.Category)
+    .Include(x => x.Orders)
+        .ThenInclude(o => o.Review)
+    .Where(x => !x.IsDeleted)
+    .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(query.Search))
         {
@@ -35,7 +37,15 @@ public class ServiceRepository
                 x.Name.ToLower().Contains(search) ||
                 x.Description.ToLower().Contains(search));
         }
+        if (query.MinPrice.HasValue)
+        {
+            services = services.Where(x => x.BasePrice >= query.MinPrice.Value);
+        }
 
+        if (query.MaxPrice.HasValue)
+        {
+            services = services.Where(x => x.BasePrice <= query.MaxPrice.Value);
+        }
         if (query.CategoryId.HasValue)
         {
             services = services.Where(x =>
@@ -46,12 +56,25 @@ public class ServiceRepository
         {
             switch (query.Sort.ToLower())
             {
-                case "price":
+                case "priceasc":
                     services = services.OrderBy(x => x.BasePrice);
                     break;
 
-                case "name":
-                    services = services.OrderBy(x => x.Name);
+                case "pricedesc":
+                    services = services.OrderByDescending(x => x.BasePrice);
+                    break;
+
+                case "recommended":
+                    services = services
+                        .OrderByDescending(x =>
+                            x.Orders
+                                .Where(o => o.Review != null)
+                                .Average(o => (double?)o.Review!.Rating) ?? 0)
+                        .ThenBy(x => x.BasePrice);
+                    break;
+
+                default:
+                    services = services.OrderByDescending(x => x.Id);
                     break;
             }
         }

@@ -102,11 +102,11 @@ public class OrderRepository : GenericRepository<Order>, IOrderRepository
                 x.CreatedAt <= DateTime.UtcNow.AddMinutes(-30))
             .ToListAsync();
     }
-    public async Task<List<Order>> GetOrdersForReminderAsync()
+    
+       public async Task<List<Order>> GetOrdersForReminderAsync()
     {
-        var now = DateTime.Now;
-
-        var tomorrow = now.AddMinutes(5);
+        var from = DateTime.Now.AddHours(24);
+        var to = from.AddMinutes(1);
 
         return await _context.Orders
             .Include(x => x.Customer)
@@ -114,8 +114,8 @@ public class OrderRepository : GenericRepository<Order>, IOrderRepository
             .Where(x =>
                 x.Status == OrderStatus.Accepted &&
                 !x.ReminderEmailSent &&
-                x.ScheduledDate >= now &&
-                x.ScheduledDate <= tomorrow)
+                x.ScheduledDate >= from &&
+                x.ScheduledDate < to)
             .ToListAsync();
     }
 }

@@ -27,7 +27,16 @@ public class MappingProfile : Profile
      .ForMember(x => x.ProviderName,
          opt => opt.MapFrom(x => x.Provider.User.FullName))
      .ForMember(x => x.CategoryName,
-         opt => opt.MapFrom(x => x.Provider.Category.Name));
+         opt => opt.MapFrom(x => x.Provider.Category.Name))
+     .ForMember(x => x.AverageRating,
+    opt => opt.MapFrom(x =>
+        x.Orders
+         .Where(o => o.Review != null)
+         .Average(o => (double?)o.Review!.Rating) ?? 0))
+
+.ForMember(x => x.ReviewCount,
+    opt => opt.MapFrom(x =>
+        x.Orders.Count(o => o.Review != null)));
 
         // -------------------- ADDRESS --------------------
 

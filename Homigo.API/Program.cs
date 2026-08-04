@@ -181,9 +181,9 @@ namespace Homigo.API
 job => job.ExecuteAsync(),
 "*/5 * * * *");
             RecurringJob.AddOrUpdate<AppointmentReminderJob>(
-    "appointment-reminders",
-    job => job.ExecuteAsync(),
-    "*/30 * * * *");
+      "appointment-reminders",
+      job => job.ExecuteAsync(),
+      "* * * * *");
             app.MapControllers();
 
             app.Run();
