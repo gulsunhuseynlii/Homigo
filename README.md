@@ -1,198 +1,113 @@
-# Homigo API
+# Homigo
 
-Homigo API is a backend application developed with ASP.NET Core Web API. It is designed for a home service platform where customers can book services, providers can manage their work, and administrators can manage the system.
-
-The project focuses on clean architecture principles by separating responsibilities into controllers, services, repositories, entities and DTOs.
-
----
+Homigo is a home service booking platform developed with ASP.NET Core Web API and React. The application allows customers to find service providers, book appointments, make online payments and communicate with providers through real-time chat. Providers can manage their services, respond to booking requests and track their work from a dedicated dashboard.
 
 ## Features
 
-### Authentication
-
-- User registration
-- JWT authentication
-- Email verification
-- Password hashing with BCrypt
-- Role-based authorization
-
 ### Customer
 
+- User registration and login
+- Browse services by category
+- Search, filter and sort services
+- Save favorite services
 - Manage addresses
-- Browse service categories
-- Create service orders
-- Add or remove favorite services
-- Make payments
-- Leave reviews after completed orders
+- Book appointments
+- Online payment with Stripe
+- View and cancel orders
+- Leave reviews after completed services
+- Real-time chat with providers
+- Instant booking notifications
 
 ### Provider
 
-- Apply to become a provider
-- Get approved by an administrator
-- Accept customer orders
-- Start and complete orders
-- Manage assigned services
-
-### Admin
-
-- Create and manage categories
 - Create and manage services
-- Approve provider applications
-
----
+- Accept or reject bookings
+- Start and complete jobs
+- View dashboard statistics
+- Communicate with customers in real time
+- Receive booking notifications
 
 ## Technologies
+
+### Backend
 
 - ASP.NET Core Web API
 - Entity Framework Core
 - SQL Server
+- JWT Authentication
+- SignalR
+- Hangfire
 - AutoMapper
 - FluentValidation
-- JWT Authentication
-- BCrypt.Net
-- Swagger (OpenAPI)
-- Repository Pattern
+- Stripe API
 
----
+### Frontend
+
+- React
+- React Router
+- Tailwind CSS
+- Axios
+- React Hot Toast
+- SignalR Client
 
 ## Project Structure
 
 ```
-Controllers
+Homigo
+├── Homigo.API
+│   ├── Controllers
+│   ├── Services
+│   ├── Repositories
+│   ├── DTOs
+│   ├── Entities
+│   ├── Hubs
+│   └── ...
 │
-├── Services
-│
-├── Repositories
-│
-├── DTOs
-│
-├── Entities
-│
-├── Mappings
-│
-├── Middlewares
-│
-└── Validators
+└── homigo-ui
+    ├── components
+    ├── pages
+    ├── services
+    ├── layouts
+    └── ...
 ```
 
----
+## Getting Started
 
-## User Roles
-
-- Admin
-- Customer
-- Provider
-
----
-
-## Order Workflow
-
-```
-Customer
-
-↓
-
-Create Order
-
-↓
-
-Provider Accepts
-
-↓
-
-In Progress
-
-↓
-
-Completed
-
-↓
-
-Payment
-
-↓
-
-Review
-```
-
----
-
-## API Modules
-
-- Authentication
-- Category Management
-- Service Management
-- Address Management
-- Provider Management
-- Order Management
-- Payment Management
-- Review Management
-- Favorite Management
-
----
-
-## Running the Project
-
-Clone the repository
+Clone the repository:
 
 ```bash
-git clone <(https://github.com/gulsunhuseynlii/Homigo)>
+git clone https://github.com/gulsunhuseynlii/Homigo.git
 ```
 
-Go to the project folder
+### Backend
 
 ```bash
 cd Homigo.API
-```
-
-Update the required values in **appsettings.json**
-
-- SQL Server connection string
-- JWT settings
-- Email settings
-
-Run migrations
-
-```bash
-Update-Database
-```
-
-Start the application
-
-```bash
+dotnet restore
+dotnet ef database update
 dotnet run
 ```
 
-Swagger will be available at
+### Frontend
 
+```bash
+cd homigo-ui
+npm install
+npm run dev
 ```
-https://localhost:7121/swagger
-```
 
----
+## Screenshots
 
-## Notes
+Screenshots of the application can be found below.
 
-- Email verification is required before login.
-- Only approved providers can accept orders.
-- A payment can only be created once for an order.
-- Customers can leave only one review per completed order.
-- Soft delete is used for some entities.
-
----
-
-## Future Improvements
-
-- Docker support
-- Refresh Token authentication
-- Unit testing
-- Redis caching
-- Payment gateway integration
-
----
+- Home
+- Services
+- Booking
+- Customer Orders
+- Provider Dashboard
+- Chat
+- Payment
 
 ## Author
 
-**Gulsun Huseynli**
-
-Backend Developer (ASP.NET Core)
+Gülsün Hüseynli
