@@ -6,6 +6,7 @@ import { getAddresses } from "../services/addressService";
 import { getProviderById } from "../services/providerService";
 import { getServiceById } from "../services/serviceService";
 import { createOrder } from "../services/orderService";
+import { getAvailableSlots } from "../services/providerService";
 
 function Booking() {
   const navigate = useNavigate();
@@ -22,8 +23,35 @@ function Booking() {
 
   const [addressId, setAddressId] = useState("");
 
-  const [scheduledDate, setScheduledDate] = useState("");
+const [selectedDate, setSelectedDate] = useState("");
 
+const [availableSlots, setAvailableSlots] = useState([]);
+
+const [selectedTime, setSelectedTime] = useState("");
+useEffect(() => {
+  if (!selectedDate) return;
+
+  loadAvailableSlots();
+}, [selectedDate]);
+const loadAvailableSlots = async () => {
+  try {
+    console.log("Loading slots...");
+    console.log(providerId);
+    console.log(selectedDate);
+
+    const data = await getAvailableSlots(
+      providerId,
+      selectedDate
+    );
+
+    console.log("Slots:", data);
+
+    setAvailableSlots(data);
+  } catch (error) {
+    console.log(error);
+    toast.error("Failed to load available times.");
+  }
+};
   useEffect(() => {
     loadPage();
   }, []);
@@ -55,20 +83,21 @@ console.log({
   serviceId: Number(serviceId),
   providerId: Number(providerId),
   addressId: Number(addressId),
-  scheduledDate,
+  selectedDate,
+  selectedTime,
 });
 const handleSubmit = async () => {
-  if (!scheduledDate) {
-    toast.error("Please select a date.");
-    return;
-  }
+ if (!selectedDate || !selectedTime) {
+  toast.error("Please select date and time.");
+  return;
+}
 
   try {
     const result = await createOrder({
       serviceId: Number(serviceId),
       providerId: Number(providerId),
       addressId: Number(addressId),
-      scheduledDate,
+      scheduledDate: `${selectedDate}T${selectedTime}`,
     });
 
     toast.success("Order created successfully.");
@@ -142,20 +171,60 @@ const handleSubmit = async () => {
 
         <div className="mt-6">
 
-          <label className="mb-2 block font-semibold">
-            Date
-          </label>
+  <label className="mb-2 block font-semibold">
+    Select Date
+  </label>
 
-          <input
-            type="datetime-local"
-            className="w-full rounded-lg border p-3"
-            value={scheduledDate}
-            onChange={(e) =>
-              setScheduledDate(e.target.value)
-            }
-          />
+  <input
+    type="date"
+    className="w-full rounded-xl border p-3"
+    value={selectedDate}
+    onChange={(e) => {
+      setSelectedDate(e.target.value);
+      setSelectedTime("");
+    }}
+  />
 
-        </div>
+</div>
+
+<div className="mt-6">
+
+  <label className="mb-3 block font-semibold">
+    Available Times
+  </label>
+
+{!selectedDate ? (
+  <p className="text-slate-500">
+    Select a date to see available times.
+  </p>
+) : availableSlots.length === 0 ? (
+  <p className="text-red-500">
+    No available times for this day.
+  </p>
+) : (
+    <div className="flex flex-wrap gap-3">
+
+      {availableSlots
+        .filter((x) => x.isAvailable)
+        .map((slot) => (
+          <button
+            key={slot.time}
+            type="button"
+            onClick={() => setSelectedTime(slot.time)}
+            className={`rounded-xl border px-5 py-3 transition ${
+              selectedTime === slot.time
+                ? "border-blue-600 bg-blue-600 text-white"
+                : "border-slate-300 bg-white hover:bg-slate-100"
+            }`}
+          >
+            {slot.time.slice(0, 5)}
+          </button>
+        ))}
+
+    </div>
+  )}
+
+</div>
 
         <button
           onClick={handleSubmit}

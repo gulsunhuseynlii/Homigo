@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import Pagination from "../components/common/Pagination";
 import Spinner from "../components/common/Spinner";
+import ChatModal from "../components/chat/ChatModal";
+
 import {
   getMyOrders,
   cancelOrder,
@@ -16,6 +18,7 @@ function MyOrders() {
   const [page, setPage] = useState(1);
 const [totalPages, setTotalPages] = useState(1);
 const [selectedOrder, setSelectedOrder] = useState(null);
+const [chatOrder, setChatOrder] = useState(null);
 
 useEffect(() => {
   loadOrders();
@@ -82,11 +85,12 @@ if (loading) {
         <div className="space-y-6">
           {orders.map((order) => (
             <OrderCard
-              key={order.id}
-              order={order}
-              onCancel={handleCancel}
-              onReview={handleReview}
-            />
+  key={order.id}
+  order={order}
+  onCancel={handleCancel}
+  onReview={handleReview}
+  onChat={setChatOrder}
+/>
           ))}
         </div>
       )}
@@ -108,6 +112,12 @@ if (loading) {
   totalPages={totalPages}
   onPageChange={setPage}
 />
+{chatOrder && (
+  <ChatModal
+    orderId={chatOrder.id}
+    onClose={() => setChatOrder(null)}
+  />
+)}
     </div>
   );
 }

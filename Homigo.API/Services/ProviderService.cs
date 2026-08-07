@@ -2,6 +2,7 @@
 using Hangfire;
 using Homigo.API.DTOs.Common;
 using Homigo.API.DTOs.Provider;
+using Homigo.API.DTOs.ProviderAvailability;
 using Homigo.API.Entities;
 using Homigo.API.Exceptions;
 using Homigo.API.Interfaces;
@@ -237,7 +238,18 @@ public class ProviderService : IProviderService
         if (provider == null)
             throw new NotFoundException("Provider not found.");
 
-        return _mapper.Map<ProviderDto>(provider);
+        var result = _mapper.Map<ProviderDto>(provider);
+
+        result.AverageRating =
+            await _providerRepository.GetAverageRatingAsync(provider.UserId);
+
+        result.ReviewCount =
+            await _providerRepository.GetReviewCountAsync(provider.UserId);
+
+        result.CompletedOrders =
+            await _providerRepository.GetCompletedOrdersCountAsync(provider.UserId);
+
+        return result;
     }
 
     public async Task AssignServicesAsync(int providerId, AssignServicesDto dto)
@@ -303,5 +315,79 @@ public class ProviderService : IProviderService
 
         _logger.LogInformation(
             "Provider application rejected successfully.");
+    }
+    public async Task UpdateAvailabilityAsync(
+    int userId,
+    UpdateProviderAvailabilityDto dto)
+    {
+        var provider =
+            await _providerRepository.GetByUserIdAsync(userId);
+
+        if (provider == null)
+            throw new NotFoundException("Provider not found.");
+
+        await _providerRepository.DeleteAvailabilitiesAsync(provider.Id);
+
+        var list = dto.Availabilities.Select(x =>
+            new ProviderAvailability
+            {
+                ProviderId = provider.Id,
+                DayOfWeek = x.DayOfWeek,
+                StartTime = x.StartTime,
+                EndTime = x.EndTime
+            }).ToList();
+
+        await _providerRepository.AddAvailabilitiesAsync(list);
+
+        await _providerRepository.SaveChangesAsync();
+    }
+
+    public async Task<List<ProviderAvailabilityDto>>
+ GetAvailabilityAsync(int userId)
+    {
+        var list =
+            await _providerRepository
+                .GetAvailabilitiesByUserIdAsync(userId);
+
+        return _mapper.Map<List<ProviderAvailabilityDto>>(list);
+    }
+    public async Task<List<AvailableSlotDto>> GetAvailableSlotsAsync(
+        int providerUserId,
+        DateTime date)
+    {
+        var provider = await _providerRepository
+            .GetApprovedByIdAsync(providerUserId);
+
+        if (provider == null)
+            throw new NotFoundException("Provider not found.");
+
+        var availability = provider.Availabilities
+            .FirstOrDefault(x => x.DayOfWeek == date.DayOfWeek);
+
+        if (availability == null)
+            return new List<AvailableSlotDto>();
+
+        var orders = await _providerRepository.GetOrdersByDateAsync(
+            providerUserId,
+            date);
+
+        var slots = new List<AvailableSlotDto>();
+
+        for (
+            var time = availability.StartTime;
+            time < availability.EndTime;
+            time = time.Add(TimeSpan.FromHours(1)))
+        {
+            var isBooked = orders.Any(x =>
+                x.ScheduledDate.TimeOfDay == time);
+
+            slots.Add(new AvailableSlotDto
+            {
+                Time = time,
+                IsAvailable = !isBooked
+            });
+        }
+
+        return slots;
     }
 }

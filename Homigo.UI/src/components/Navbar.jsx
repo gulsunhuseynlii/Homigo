@@ -113,10 +113,15 @@ function Navbar() {
                 </>
               )}
 
-              {/* Provider */}
-
-             {role === "Provider" && (
+              {role === "Provider" && (
   <>
+    <Link
+      to="/provider"
+      className="font-semibold transition hover:text-blue-100"
+    >
+      Dashboard
+    </Link>
+
     <Link
       to="/provider/services"
       className="font-semibold transition hover:text-blue-100"
@@ -129,6 +134,13 @@ function Navbar() {
       className="font-semibold transition hover:text-blue-100"
     >
       My Jobs
+    </Link>
+
+    <Link
+      to="/provider/availability"
+      className="font-semibold transition hover:text-blue-100"
+    >
+      Availability
     </Link>
   </>
 )}

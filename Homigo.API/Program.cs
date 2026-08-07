@@ -4,6 +4,7 @@ using Hangfire;
 using Hangfire.SqlServer;
 using Homigo.API.Configurations;
 using Homigo.API.Data;
+using Homigo.API.Hubs;
 using Homigo.API.Interfaces;
 using Homigo.API.Jobs;
 using Homigo.API.Mappings;
@@ -13,6 +14,7 @@ using Homigo.API.Repositories.Interfaces;
 using Homigo.API.Services;
 using Homigo.API.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -28,8 +30,14 @@ namespace Homigo.API
             // Add services to the container.
 
             builder.Services.AddControllers();
+
+            builder.Services.AddSignalR();
+
+            builder.Services.AddSingleton<IUserIdProvider, UserIdProvider>();
+
             builder.Services.Configure<StripeSettings>(
     builder.Configuration.GetSection("Stripe"));
+
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddScoped<IAuthService, AuthService>();
@@ -44,6 +52,7 @@ namespace Homigo.API
             builder.Services.AddScoped<IFavoriteService, FavoriteService>();
             builder.Services.AddScoped<IEmailService, EmailService>();
             builder.Services.AddScoped<IFileService, FileService>();
+            builder.Services.AddScoped<IChatService, ChatService>();
 
             builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
@@ -56,6 +65,7 @@ namespace Homigo.API
             builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
             builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
             builder.Services.AddScoped<IFavoriteRepository, FavoriteRepository>();
+            builder.Services.AddScoped<IChatRepository, ChatRepository>();
 
             builder.Services.AddScoped<ExpiredOrderJob>();
             builder.Services.AddScoped<AppointmentReminderJob>();
@@ -132,7 +142,36 @@ namespace Homigo.API
             IssuerSigningKey = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
         };
-    });
+            options.Events = new JwtBearerEvents
+            {
+                OnMessageReceived = context =>
+                {
+                    var accessToken = context.Request.Query["access_token"];
+
+                    var path = context.HttpContext.Request.Path;
+
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = context =>
+                        {
+                            var accessToken = context.Request.Query["access_token"];
+                            var path = context.HttpContext.Request.Path;
+
+                            if (!string.IsNullOrEmpty(accessToken) &&
+                                (path.StartsWithSegments("/notificationHub") ||
+                                 path.StartsWithSegments("/chatHub")))
+                            {
+                                context.Token = accessToken;
+                            }
+
+                            return Task.CompletedTask;
+                        }
+                    };
+
+                    return Task.CompletedTask;
+                }
+            };
+        });
             builder.Services.AddFluentValidationAutoValidation();
             builder.Services.Configure<EmailSettings>(
     builder.Configuration.GetSection("EmailSettings"));
@@ -144,7 +183,8 @@ namespace Homigo.API
                 {
                     policy.WithOrigins("http://localhost:5173")
                           .AllowAnyHeader()
-                          .AllowAnyMethod();
+                          .AllowAnyMethod()
+                          .AllowCredentials();
                 });
             });
             Stripe.StripeConfiguration.ApiKey =
@@ -186,6 +226,8 @@ job => job.ExecuteAsync(),
       "* * * * *");
             app.MapControllers();
 
+            app.MapHub<NotificationHub>("/notificationHub");
+            app.MapHub<ChatHub>("/chatHub");
             app.Run();
         }
     }

@@ -2,6 +2,7 @@ function OrderCard({
   order,
   onCancel,
   onReview,
+  onChat,
 }) {
   const getStatusStyle = (status) => {
     switch (status) {
@@ -123,6 +124,14 @@ function OrderCard({
           <strong>Total:</strong>{" "}
           {order.totalPrice} ₼
         </p>
+        <div className="mt-6">
+  <button
+    onClick={() => onChat(order)}
+    className="rounded-lg bg-slate-800 px-6 py-2 text-white transition hover:bg-slate-900"
+  >
+    💬 Chat
+  </button>
+</div>
       </div>
     </div>
   );

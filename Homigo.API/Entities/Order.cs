@@ -29,4 +29,7 @@ public class Order : BaseEntity
     public Review? Review { get; set; }
     public Payment? Payment { get; set; }
     public bool ReminderEmailSent { get; set; } = false;
+    public string? GoogleEventId { get; set; }
+    public ICollection<ChatMessage> ChatMessages { get; set; }
+    = new List<ChatMessage>();
 }

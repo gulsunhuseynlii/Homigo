@@ -28,6 +28,8 @@ import Payment from "../pages/Payment";
 import PaymentSuccess from "../pages/PaymentSuccess";
 import MyPayments from "../pages/MyPayments";
 import MyFavorites from "../pages/MyFavorites";
+import ProviderDetail from "../pages/ProviderDetail";
+import ProviderAvailability from "../pages/ProviderAvailability";
 
 function AppRoutes() {
   return (
@@ -220,6 +222,18 @@ function AppRoutes() {
   element={
     <ProtectedRoute roles={["Customer"]}>
       <MyFavorites />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/providers/:id"
+  element={<ProviderDetail />}
+/>
+<Route
+  path="/provider/availability"
+  element={
+    <ProtectedRoute roles={["Provider"]}>
+      <ProviderAvailability />
     </ProtectedRoute>
   }
 />

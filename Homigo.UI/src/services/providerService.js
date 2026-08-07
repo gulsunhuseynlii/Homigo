@@ -50,3 +50,16 @@ export const getMyServices = async () => {
   const response = await api.get("/Service/my");
   return response.data;
 };
+export const getAvailableSlots = async (
+  providerId,
+  date
+) => {
+  const response = await api.get(
+    `/Provider/${providerId}/available-slots`,
+    {
+      params: { date },
+    }
+  );
+
+  return response.data;
+};

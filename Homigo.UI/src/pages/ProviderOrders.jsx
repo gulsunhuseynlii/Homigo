@@ -3,6 +3,7 @@ import toast from "react-hot-toast";
 import Pagination from "../components/common/Pagination";
 import Spinner from "../components/common/Spinner";
 import ProviderOrderCard from "../components/provider/ProviderOrderCard";
+import ChatModal from "../components/chat/ChatModal";
 
 import {
   getMyJobs,
@@ -17,6 +18,7 @@ function ProviderOrders() {
   const [loading, setLoading] = useState(true);
 const [page, setPage] = useState(1);
 const [totalPages, setTotalPages] = useState(1);
+const [selectedOrder, setSelectedOrder] = useState(null);
 
   useEffect(() => {
   loadOrders();
@@ -119,6 +121,7 @@ if (loading) {
   onReject={handleReject}
   onStart={handleStart}
   onComplete={handleComplete}
+  onChat={setSelectedOrder}
 />
           ))}
 
@@ -130,6 +133,12 @@ if (loading) {
   totalPages={totalPages}
   onPageChange={setPage}
 />
+{selectedOrder && (
+  <ChatModal
+    orderId={selectedOrder.id}
+    onClose={() => setSelectedOrder(null)}
+  />
+)}
     </div>
   );
 }

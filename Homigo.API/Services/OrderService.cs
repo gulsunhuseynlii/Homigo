@@ -8,6 +8,8 @@ using Homigo.API.Exceptions;
 using Homigo.API.Interfaces;
 using Homigo.API.Repositories.Interfaces;
 using Microsoft.Extensions.Logging;
+using Homigo.API.Hubs;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Homigo.API.Services;
 
@@ -19,6 +21,7 @@ public class OrderService : IOrderService
     private readonly IPaymentRepository _paymentRepository;
     private readonly IPaymentService _paymentService;
     private readonly IEmailService _emailService;
+    private readonly IHubContext<NotificationHub> _hubContext;
 
     public OrderService(
      IOrderRepository orderRepository,
@@ -26,7 +29,7 @@ public class OrderService : IOrderService
       IPaymentService paymentService,
      IMapper mapper,
      ILogger<OrderService> logger,
-     IEmailService emailService)
+     IEmailService emailService, IHubContext<NotificationHub> hubContext)
     {
         _orderRepository = orderRepository;
         _paymentRepository = paymentRepository;
@@ -34,6 +37,7 @@ public class OrderService : IOrderService
         _mapper = mapper;
         _logger = logger;
         _emailService = emailService;
+        _hubContext = hubContext;
     }
 
     public async Task<int> CreateAsync(
@@ -79,7 +83,23 @@ public class OrderService : IOrderService
 
         await _orderRepository.AddAsync(order);
         await _orderRepository.SaveChangesAsync();
+        _logger.LogInformation(
+   "Order ProviderId: {ProviderId}",
+   order.ProviderId);
 
+        _logger.LogInformation(
+            "CustomerId: {CustomerId}",
+            order.CustomerId);
+        await _hubContext
+     .Clients
+     .User(order.ProviderId.ToString())
+     .SendAsync(
+         "ReceiveNotification",
+         new
+         {
+             message = "You have a new booking!"
+         });
+       
         _logger.LogInformation(
             "Order {OrderId} created successfully.",
             order.Id);
@@ -132,6 +152,15 @@ public class OrderService : IOrderService
 
         await _orderRepository.UpdateAsync(order);
         await _orderRepository.SaveChangesAsync();
+
+        await _hubContext.Clients.All.SendAsync(
+            "ReceiveNotification",
+            new
+            {
+                Title = "Order Accepted",
+                Message = $"{order.Service.Name} booking has been accepted.",
+                OrderId = order.Id
+            });
 
         BackgroundJob.Enqueue<IEmailService>(x =>
             x.SendOrderAcceptedEmailAsync(

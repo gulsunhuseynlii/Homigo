@@ -30,5 +30,12 @@ public class User : BaseEntity
 
     public ICollection<EmailVerificationToken> EmailVerificationTokens { get; set; }
         = new List<EmailVerificationToken>();
-  
+    public string? GoogleAccessToken { get; set; }
+
+    public string? GoogleRefreshToken { get; set; }
+    public ICollection<ChatMessage> SentMessages { get; set; }
+    = new List<ChatMessage>();
+
+    public ICollection<ChatMessage> ReceivedMessages { get; set; }
+        = new List<ChatMessage>();
 }

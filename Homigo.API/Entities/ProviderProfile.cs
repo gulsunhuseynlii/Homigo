@@ -29,4 +29,6 @@ public class ProviderProfile : BaseEntity
     public int CategoryId { get; set; }
 
     public Category Category { get; set; } = null!;
+    public ICollection<ProviderAvailability> Availabilities { get; set; }
+    = new List<ProviderAvailability>();
 }

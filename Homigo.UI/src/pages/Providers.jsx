@@ -58,15 +58,18 @@ if (loading) {
 ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {providers.map((provider) => (
-            <ProviderCard
-              key={provider.id}
-              provider={provider}
-              onClick={() =>
-                navigate(
-                  `/booking?serviceId=${serviceId}&providerId=${provider.userId}`
-                )
-              }
-            />
+           <ProviderCard
+  key={provider.id}
+  provider={provider}
+  onViewProfile={() =>
+    navigate(`/providers/${provider.userId}`)
+  }
+  onClick={() =>
+    navigate(
+      `/booking?serviceId=${serviceId}&providerId=${provider.userId}`
+    )
+  }
+/>
           ))}
         </div>
       )}

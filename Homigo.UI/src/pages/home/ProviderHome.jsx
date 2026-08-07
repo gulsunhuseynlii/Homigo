@@ -4,15 +4,27 @@ import toast from "react-hot-toast";
 import Spinner from "../../components/common/Spinner";
 import { getMyServices } from "../../services/providerService";
 import { getMyProviderOrders } from "../../services/orderService";
+import {
+  startConnection,
+  onReceiveNotification,
+} from "../../services/notificationService";
 
 function ProviderHome() {
   const [services, setServices] = useState([]);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+useEffect(() => {
+  loadData();
+
+  startConnection();
+
+  onReceiveNotification(() => {
     loadData();
-  }, []);
+  });
+}, []);
+
+ 
 
   const loadData = async () => {
   try {

@@ -18,4 +18,16 @@ public interface IProviderRepository : IGenericRepository<ProviderProfile>
     Task<List<Service>> GetServicesByIdsAsync(List<int> serviceIds);
     Task<List<ProviderProfile>> GetApprovedProvidersAsync(int? serviceId);
     Task<double> GetAverageRatingAsync(int providerUserId);
+    Task<int> GetReviewCountAsync(int providerUserId);
+
+    Task<int> GetCompletedOrdersCountAsync(int providerUserId);
+    Task<List<ProviderAvailability>> GetAvailabilitiesAsync(int providerId);
+
+    Task DeleteAvailabilitiesAsync(int providerId);
+
+    Task AddAvailabilitiesAsync(List<ProviderAvailability> availabilities);
+    Task<List<Order>> GetOrdersByDateAsync(
+    int providerUserId,
+    DateTime date);
+    Task<List<ProviderAvailability>> GetAvailabilitiesByUserIdAsync(int userId);
 }

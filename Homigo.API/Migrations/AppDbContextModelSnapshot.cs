@@ -108,6 +108,50 @@ namespace Homigo.API.Migrations
                     b.ToTable("Categories");
                 });
 
+            modelBuilder.Entity("Homigo.API.Entities.ChatMessage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ReceiverId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SenderId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderId");
+
+                    b.HasIndex("ReceiverId");
+
+                    b.HasIndex("SenderId");
+
+                    b.ToTable("ChatMessages");
+                });
+
             modelBuilder.Entity("Homigo.API.Entities.EmailVerificationToken", b =>
                 {
                     b.Property<int>("Id")
@@ -178,6 +222,9 @@ namespace Homigo.API.Migrations
 
                     b.Property<int>("CustomerId")
                         .HasColumnType("int");
+
+                    b.Property<string>("GoogleEventId")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -255,6 +302,42 @@ namespace Homigo.API.Migrations
                         .IsUnique();
 
                     b.ToTable("Payments");
+                });
+
+            modelBuilder.Entity("Homigo.API.Entities.ProviderAvailability", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("DayOfWeek")
+                        .HasColumnType("int");
+
+                    b.Property<TimeSpan>("EndTime")
+                        .HasColumnType("time");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("ProviderId")
+                        .HasColumnType("int");
+
+                    b.Property<TimeSpan>("StartTime")
+                        .HasColumnType("time");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProviderId");
+
+                    b.ToTable("ProviderAvailabilities");
                 });
 
             modelBuilder.Entity("Homigo.API.Entities.Review", b =>
@@ -399,6 +482,12 @@ namespace Homigo.API.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("GoogleAccessToken")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("GoogleRefreshToken")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
@@ -502,6 +591,33 @@ namespace Homigo.API.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Homigo.API.Entities.ChatMessage", b =>
+                {
+                    b.HasOne("Homigo.API.Entities.Order", "Order")
+                        .WithMany("ChatMessages")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Homigo.API.Entities.User", "Receiver")
+                        .WithMany("ReceivedMessages")
+                        .HasForeignKey("ReceiverId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Homigo.API.Entities.User", "Sender")
+                        .WithMany("SentMessages")
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Order");
+
+                    b.Navigation("Receiver");
+
+                    b.Navigation("Sender");
+                });
+
             modelBuilder.Entity("Homigo.API.Entities.EmailVerificationToken", b =>
                 {
                     b.HasOne("Homigo.API.Entities.User", "User")
@@ -575,6 +691,17 @@ namespace Homigo.API.Migrations
                         .IsRequired();
 
                     b.Navigation("Order");
+                });
+
+            modelBuilder.Entity("Homigo.API.Entities.ProviderAvailability", b =>
+                {
+                    b.HasOne("ProviderProfile", "Provider")
+                        .WithMany("Availabilities")
+                        .HasForeignKey("ProviderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Provider");
                 });
 
             modelBuilder.Entity("Homigo.API.Entities.Review", b =>
@@ -665,6 +792,8 @@ namespace Homigo.API.Migrations
 
             modelBuilder.Entity("Homigo.API.Entities.Order", b =>
                 {
+                    b.Navigation("ChatMessages");
+
                     b.Navigation("Payment");
 
                     b.Navigation("Review");
@@ -699,10 +828,16 @@ namespace Homigo.API.Migrations
                     b.Navigation("ProviderProfile");
 
                     b.Navigation("ProviderReviews");
+
+                    b.Navigation("ReceivedMessages");
+
+                    b.Navigation("SentMessages");
                 });
 
             modelBuilder.Entity("ProviderProfile", b =>
                 {
+                    b.Navigation("Availabilities");
+
                     b.Navigation("Reviews");
 
                     b.Navigation("Services");

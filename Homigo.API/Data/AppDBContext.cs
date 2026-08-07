@@ -24,6 +24,8 @@ public class AppDbContext : DbContext
     public DbSet<Payment> Payments { get; set; }
     public DbSet<Favorite> Favorites { get; set; }
     public DbSet<EmailVerificationToken> EmailVerificationTokens { get; set; }
+    public DbSet<ProviderAvailability> ProviderAvailabilities { get; set; }
+    public DbSet<ChatMessage> ChatMessages { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -130,5 +132,26 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Payment>()
             .Property(x => x.Amount)
             .HasPrecision(18, 2);
+        modelBuilder.Entity<ProviderAvailability>()
+    .HasOne(x => x.Provider)
+    .WithMany(x => x.Availabilities)
+    .HasForeignKey(x => x.ProviderId)
+    .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<ChatMessage>()
+    .HasOne(x => x.Sender)
+    .WithMany(x => x.SentMessages)
+    .HasForeignKey(x => x.SenderId)
+    .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<ChatMessage>()
+            .HasOne(x => x.Receiver)
+            .WithMany(x => x.ReceivedMessages)
+            .HasForeignKey(x => x.ReceiverId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<ChatMessage>()
+            .HasOne(x => x.Order)
+            .WithMany(x => x.ChatMessages)
+            .HasForeignKey(x => x.OrderId);
     }
 }

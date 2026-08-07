@@ -1,7 +1,11 @@
 ﻿using Homigo.API.Data;
 using Homigo.API.Entities;
+using Homigo.API.Enums;
 using Homigo.API.Repositories.Interfaces;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace Homigo.API.Repositories.Implementations;
 
@@ -72,6 +76,7 @@ public class ProviderRepository
             .Include(x => x.Category)
             .Include(x => x.Reviews)
             .Include(x => x.Services)
+            .Include(x => x.Availabilities)
             .FirstOrDefaultAsync(x =>
                 x.UserId == id &&
                 x.IsApproved &&
@@ -106,5 +111,61 @@ public class ProviderRepository
         return await _context.Reviews
             .Where(r => r.ProviderId == providerUserId)
             .AverageAsync(r => (double?)r.Rating) ?? 0;
+    }
+    public async Task<int> GetReviewCountAsync(int providerUserId)
+    {
+        return await _context.Reviews
+            .CountAsync(r => r.ProviderId == providerUserId);
+    }
+
+    public async Task<int> GetCompletedOrdersCountAsync(int providerUserId)
+    {
+        return await _context.Orders
+            .CountAsync(o =>
+                o.ProviderId == providerUserId &&
+                o.Status == OrderStatus.Completed);
+    }
+    public async Task<List<ProviderAvailability>> GetAvailabilitiesAsync(int providerId)
+    {
+        return await _context.ProviderAvailabilities
+            .Where(x => x.ProviderId == providerId)
+            .OrderBy(x => x.DayOfWeek)
+            .ToListAsync();
+    }
+
+    public async Task DeleteAvailabilitiesAsync(int providerId)
+    {
+        var list = await _context.ProviderAvailabilities
+            .Where(x => x.ProviderId == providerId)
+            .ToListAsync();
+
+        _context.ProviderAvailabilities.RemoveRange(list);
+    }
+
+    public async Task AddAvailabilitiesAsync(List<ProviderAvailability> availabilities)
+    {
+        await _context.ProviderAvailabilities.AddRangeAsync(availabilities);
+    }
+    public async Task<List<Order>> GetOrdersByDateAsync(
+    int providerUserId,
+    DateTime date)
+    {
+
+        return await _context.Orders
+            .Where(x =>
+                x.ProviderId == providerUserId &&
+                x.ScheduledDate.Date == date.Date &&
+                x.Status != OrderStatus.Cancelled)
+            .ToListAsync();
+    }
+  
+    public async Task<List<ProviderAvailability>>
+GetAvailabilitiesByUserIdAsync(int userId)
+    {
+        return await _context.ProviderAvailabilities
+            .Include(x => x.Provider)
+            .Where(x => x.Provider.UserId == userId)
+            .OrderBy(x => x.DayOfWeek)
+            .ToListAsync();
     }
 }

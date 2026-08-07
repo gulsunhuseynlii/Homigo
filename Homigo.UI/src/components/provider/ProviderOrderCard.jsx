@@ -6,6 +6,7 @@ function ProviderOrderCard({
   onReject,
   onStart,
   onComplete,
+  onChat,
 }) {
   const getStatusStyle = (status) => {
     switch (status) {
@@ -88,55 +89,62 @@ function ProviderOrderCard({
 
       </div>
 
-      <div className="mt-6 flex gap-3">
+    <div className="mt-6 flex flex-wrap gap-3">
 
-        {order.status === "Pending" && (
-          <>
-            <Button onClick={() => onAccept(order.id)}>
-              Accept
-            </Button>
+  {order.status === "Pending" && (
+    <>
+      <Button onClick={() => onAccept(order.id)}>
+        Accept
+      </Button>
 
-            <button
-              onClick={() => onReject(order.id)}
-              className="rounded-lg bg-red-600 px-6 py-2 text-white transition hover:bg-red-700"
-            >
-              Reject
-            </button>
-          </>
-        )}
+      <button
+        onClick={() => onReject(order.id)}
+        className="rounded-lg bg-red-600 px-6 py-2 text-white hover:bg-red-700"
+      >
+        Reject
+      </button>
+    </>
+  )}
 
-        {order.status === "Accepted" && (
-          <Button onClick={() => onStart(order.id)}>
-            Start
-          </Button>
-        )}
+  {order.status === "Accepted" && (
+    <Button onClick={() => onStart(order.id)}>
+      Start
+    </Button>
+  )}
 
-        {order.status === "InProgress" && (
-          <Button onClick={() => onComplete(order.id)}>
-            Complete
-          </Button>
-        )}
+  {order.status === "InProgress" && (
+    <Button onClick={() => onComplete(order.id)}>
+      Complete
+    </Button>
+  )}
 
-        {order.status === "Completed" && (
-          <div className="font-semibold text-green-600">
-            ✅ Completed
-          </div>
-        )}
+  {order.status === "Completed" && (
+    <div className="font-semibold text-green-600">
+      ✅ Completed
+    </div>
+  )}
 
-        {order.status === "Rejected" && (
-          <div className="font-semibold text-red-600">
-            ❌ Rejected
-          </div>
-        )}
+  {order.status === "Rejected" && (
+    <div className="font-semibold text-red-600">
+      ❌ Rejected
+    </div>
+  )}
 
-        {order.status === "Cancelled" && (
-          <div className="font-semibold text-red-600">
-            ❌ Cancelled
-          </div>
-        )}
+  {order.status === "Cancelled" && (
+    <div className="font-semibold text-red-600">
+      ❌ Cancelled
+    </div>
+  )}
 
-      </div>
+  {/* Chat həmişə görünsün */}
+  <button
+    onClick={() => onChat(order)}
+    className="rounded-lg bg-slate-800 px-6 py-2 text-white hover:bg-slate-900"
+  >
+    💬 Chat
+  </button>
 
+</div>
     </div>
   );
 }

@@ -5,9 +5,11 @@ using Homigo.API.DTOs.Favorite;
 using Homigo.API.DTOs.Order;
 using Homigo.API.DTOs.Payment;
 using Homigo.API.DTOs.Provider;
+using Homigo.API.DTOs.ProviderAvailability;
 using Homigo.API.DTOs.Review;
 using Homigo.API.DTOs.Service;
 using Homigo.API.Entities;
+using Homigo.API.Enums;
 
 namespace Homigo.API.Mappings;
 
@@ -45,21 +47,41 @@ public class MappingProfile : Profile
         // -------------------- PROVIDER --------------------
 
         CreateMap<ProviderProfile, ProviderDto>()
-     .ForMember(x => x.UserId,
-         opt => opt.MapFrom(x => x.UserId))
-     .ForMember(x => x.FullName,
-         opt => opt.MapFrom(x => x.User.FullName))
-     .ForMember(x => x.Email,
-         opt => opt.MapFrom(x => x.User.Email))
-     .ForMember(x => x.PhoneNumber,
-         opt => opt.MapFrom(x => x.PhoneNumber))
-     .ForMember(x => x.ProfileImageUrl,
-         opt => opt.MapFrom(x => x.ProfileImageUrl))
-     .ForMember(x => x.CategoryName,
-         opt => opt.MapFrom(x => x.Category.Name))
-     .ForMember(x => x.Experience,
-         opt => opt.MapFrom(x => $"{x.YearsOfExperience} years"));
-     
+ .ForMember(x => x.UserId,
+     opt => opt.MapFrom(x => x.UserId))
+
+ .ForMember(x => x.FullName,
+     opt => opt.MapFrom(x => x.User.FullName))
+
+ .ForMember(x => x.Email,
+     opt => opt.MapFrom(x => x.User.Email))
+
+ .ForMember(x => x.PhoneNumber,
+     opt => opt.MapFrom(x => x.PhoneNumber))
+
+ .ForMember(x => x.ProfileImageUrl,
+     opt => opt.MapFrom(x => x.ProfileImageUrl))
+
+ .ForMember(x => x.CategoryName,
+     opt => opt.MapFrom(x => x.Category.Name))
+
+ .ForMember(x => x.Experience,
+     opt => opt.MapFrom(x => $"{x.YearsOfExperience} years"))
+
+ .ForMember(x => x.YearsOfExperience,
+     opt => opt.MapFrom(x => x.YearsOfExperience))
+
+ .ForMember(x => x.ReviewCount,
+     opt => opt.MapFrom(x => x.Reviews.Count))
+
+ .ForMember(x => x.CompletedOrders,
+     opt => opt.MapFrom(x =>
+         x.Services.SelectMany(s => s.Orders)
+          .Count(o => o.Status == OrderStatus.Completed)))
+
+ .ForMember(x => x.Services,
+     opt => opt.MapFrom(x => x.Services));
+
 
         CreateMap<ProviderProfile, ProviderApplicationDto>()
             .ForMember(x => x.UserId,
@@ -119,5 +141,10 @@ public class MappingProfile : Profile
          opt => opt.MapFrom(x => x.Service.BasePrice))
      .ForMember(x => x.CategoryName,
          opt => opt.MapFrom(x => x.Service.Provider.Category.Name));
+
+        CreateMap<ProviderAvailability, ProviderAvailabilityDto>();
+
+        CreateMap<ProviderAvailabilityDto, ProviderAvailability>();
     }
+
 }

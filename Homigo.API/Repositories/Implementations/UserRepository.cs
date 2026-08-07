@@ -57,4 +57,5 @@ public class UserRepository : GenericRepository<User>, IUserRepository
     {
         _context.Users.Update(user);
     }
+
 }

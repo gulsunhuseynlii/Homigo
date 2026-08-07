@@ -1,4 +1,5 @@
 ﻿using Homigo.API.DTOs.Provider;
+using Homigo.API.DTOs.ProviderAvailability;
 using Homigo.API.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -101,5 +102,55 @@ public class ProviderController : ControllerBase
         await _providerService.RejectAsync(userId);
 
         return NoContent();
+    }
+    [Authorize(Roles = "Provider")]
+    [HttpPut("availability")]
+    public async Task<IActionResult> UpdateAvailability(
+    UpdateProviderAvailabilityDto dto)
+    {
+        var userId = int.Parse(
+            User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+        await _providerService.UpdateAvailabilityAsync(userId, dto);
+
+        return Ok(new
+        {
+            message = "Availability updated successfully."
+        });
+    }
+    [AllowAnonymous]
+    [HttpGet("{providerId}/availability")]
+    public async Task<IActionResult> GetAvailability(
+    int providerId)
+    {
+        var result =
+            await _providerService.GetAvailabilityAsync(providerId);
+
+        return Ok(result);
+    }
+    [AllowAnonymous]
+    [HttpGet("{providerId}/available-slots")]
+    public async Task<IActionResult> GetAvailableSlots(
+    int providerId,
+    [FromQuery] DateTime date)
+    {
+        var result =
+            await _providerService.GetAvailableSlotsAsync(
+                providerId,
+                date);
+
+        return Ok(result);
+    }
+    [Authorize(Roles = "Provider")]
+    [HttpGet("my-availability")]
+    public async Task<IActionResult> GetMyAvailability()
+    {
+        var userId = int.Parse(
+            User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+        var result =
+            await _providerService.GetAvailabilityAsync(userId);
+
+        return Ok(result);
     }
 }
