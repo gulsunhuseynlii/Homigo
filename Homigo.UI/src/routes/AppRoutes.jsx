@@ -30,6 +30,11 @@ import MyPayments from "../pages/MyPayments";
 import MyFavorites from "../pages/MyFavorites";
 import ProviderDetail from "../pages/ProviderDetail";
 import ProviderAvailability from "../pages/ProviderAvailability";
+import Profile from "../pages/Profile";
+import AdminOrders from "../pages/AdminOrders";
+import AdminProviderDetail from "../pages/AdminProviderDetail";
+import ForgotPassword from "../pages/ForgotPassword";
+import ResetPassword from "../pages/ResetPassword";
 
 function AppRoutes() {
   return (
@@ -155,24 +160,7 @@ function AppRoutes() {
   }
 />
 
-<Route
-  path="/provider/services/edit/:id"
-  element={
-    <ProtectedRoute roles={["Provider"]}>
-      <EditService />
-    </ProtectedRoute>
-  }
-/>
 
-<Route
-  path="/provider/orders"
-  element={
-    <ProtectedRoute roles={["Provider"]}>
-      <ProviderOrders />
-    </ProtectedRoute>
-  }
-  
-/>
 <Route
   path="/admin/providers"
   element={
@@ -180,6 +168,10 @@ function AppRoutes() {
       <AdminProviders />
     </ProtectedRoute>
   }
+/>
+<Route
+  path="/admin/providers/:id"
+  element={<AdminProviderDetail />}
 />
 <Route
   path="/provider/services/edit/:id"
@@ -236,6 +228,27 @@ function AppRoutes() {
       <ProviderAvailability />
     </ProtectedRoute>
   }
+/>
+<Route
+  path="/profile"
+  element={
+    <ProtectedRoute>
+      <Profile />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/admin/orders"
+  element={<AdminOrders />}
+/>
+<Route
+  path="/forgot-password"
+  element={<ForgotPassword />}
+/>
+
+<Route
+  path="/reset-password"
+  element={<ResetPassword />}
 />
       </Routes>
     </MainLayout>

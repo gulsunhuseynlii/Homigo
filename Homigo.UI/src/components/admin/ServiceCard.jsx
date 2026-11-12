@@ -26,7 +26,7 @@ function ServiceCard({
 
         <p>
           <strong>Price:</strong>{" "}
-          {service.basePrice} ₼
+          {service.basePrice} $
         </p>
 
         <p>
