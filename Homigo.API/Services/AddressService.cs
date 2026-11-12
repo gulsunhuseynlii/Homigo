@@ -51,7 +51,10 @@ public class AddressService : IAddressService
             Building = dto.Building,
             Apartment = dto.Apartment,
             Notes = dto.Notes,
-            IsDefault = dto.IsDefault
+            IsDefault = dto.IsDefault,
+
+            Latitude = dto.Latitude,
+            Longitude = dto.Longitude
         };
 
         await _addressRepository.AddAsync(address);
@@ -88,6 +91,8 @@ public class AddressService : IAddressService
         address.Building = dto.Building;
         address.Apartment = dto.Apartment;
         address.Notes = dto.Notes;
+        address.Latitude = dto.Latitude;
+        address.Longitude = dto.Longitude;
         address.IsDefault = dto.IsDefault;
 
         await _addressRepository.UpdateAsync(address);

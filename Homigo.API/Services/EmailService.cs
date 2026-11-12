@@ -141,4 +141,51 @@ public class EmailService : IEmailService
 
         await SendEmailAsync(email, subject, body);
     }
+    public async Task SendPasswordResetEmailAsync(
+    string email,
+    string fullName,
+    string resetUrl)
+    {
+        var subject = "Homigo - Reset Your Password";
+
+        var body = $@"
+        <h2>Hello, {fullName}! 👋</h2>
+
+        <p>We received a request to reset your Homigo password.</p>
+
+        <p>Click the button below to create a new password:</p>
+
+        <br/>
+
+        <a href=""{resetUrl}""
+           style=""
+           display:inline-block;
+           padding:12px 24px;
+           background-color:#2563eb;
+           color:white;
+           text-decoration:none;
+           border-radius:8px;
+           font-weight:bold;
+           "">
+           Reset Password
+        </a>
+
+        <br/>
+        <br/>
+
+        <p>This link will expire in 30 minutes.</p>
+
+        <p>If you did not request a password reset, you can safely ignore this email.</p>
+
+        <br/>
+
+        <p>Thank you,<br/>
+        <b>Homigo Team</b></p>
+    ";
+
+        await SendEmailAsync(
+            email,
+            subject,
+            body);
+    }
 }

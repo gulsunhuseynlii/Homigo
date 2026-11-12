@@ -12,4 +12,6 @@ public interface IChatRepository
 
     Task SaveChangesAsync();
     Task MarkMessagesAsReadAsync(int orderId, int currentUserId);
+    Task<int> GetUnreadCountAsync(int userId);
+    Task<int> GetUnreadCountAsync(int userId, int orderId);
 }

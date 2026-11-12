@@ -118,4 +118,25 @@ public class OrderRepository : GenericRepository<Order>, IOrderRepository
                 x.ScheduledDate < to)
             .ToListAsync();
     }
+    public async Task<(List<Order> Orders, int TotalCount)> GetAllOrdersAsync(
+    int page,
+    int pageSize)
+    {
+        var query = _context.Orders
+            .Include(x => x.Customer)
+            .Include(x => x.Provider)
+            .Include(x => x.Service)
+            .Include(x => x.Address)
+            .Where(x => !x.IsDeleted);
+
+        var totalCount = await query.CountAsync();
+
+        var orders = await query
+            .OrderByDescending(x => x.Id)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return (orders, totalCount);
+    }
 }

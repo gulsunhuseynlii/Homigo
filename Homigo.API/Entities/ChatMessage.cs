@@ -11,7 +11,9 @@ public class ChatMessage : BaseEntity
     public int ReceiverId { get; set; }
     public User Receiver { get; set; } = null!;
 
-    public string Message { get; set; } = string.Empty;
+    public string? Message { get; set; }
+
+    public string? ImageUrl { get; set; }
 
     public bool IsRead { get; set; } = false;
 }

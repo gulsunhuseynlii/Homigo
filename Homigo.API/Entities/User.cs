@@ -38,4 +38,7 @@ public class User : BaseEntity
 
     public ICollection<ChatMessage> ReceivedMessages { get; set; }
         = new List<ChatMessage>();
+    public string? RefreshToken { get; set; }
+
+    public DateTime? RefreshTokenExpiryTime { get; set; }
 }

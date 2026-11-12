@@ -32,17 +32,43 @@ public class ChatController : ControllerBase
     }
 
     [HttpPost]
+    [Consumes("multipart/form-data")]
     public async Task<IActionResult> SendMessage(
-        SendMessageDto dto)
+    [FromForm] SendMessageDto dto)
     {
         var userId = int.Parse(
             User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-        await _chatService.SendMessageAsync(userId, dto);
+        await _chatService.SendMessageAsync(
+            userId,
+            dto);
 
         return Ok(new
         {
             message = "Message sent successfully."
         });
+    }
+
+    [HttpGet("unread-count")]
+    public async Task<IActionResult> GetUnreadCount()
+    {
+        var userId = int.Parse(
+            User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+        var count = await _chatService.GetUnreadCountAsync(userId);
+
+        return Ok(count);
+    }
+    [HttpGet("{orderId}/unread-count")]
+    public async Task<IActionResult> GetUnreadCount(int orderId)
+    {
+        var userId = int.Parse(
+            User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+        var count = await _chatService.GetUnreadCountAsync(
+            userId,
+            orderId);
+
+        return Ok(count);
     }
 }

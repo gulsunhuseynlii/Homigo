@@ -133,4 +133,14 @@ public class OrderController : ControllerBase
             message = "Order rejected successfully."
         });
     }
+    [Authorize(Roles = "Admin")]
+    [HttpGet("all")]
+    public async Task<IActionResult> GetAllOrders(
+    [FromQuery] OrderQueryDto query)
+    {
+        var result =
+            await _orderService.GetAllOrdersAsync(query);
+
+        return Ok(result);
+    }
 }

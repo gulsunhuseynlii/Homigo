@@ -21,5 +21,12 @@ public class Address : BaseEntity
     public string? Notes { get; set; }
 
     public bool IsDefault { get; set; }
-    public ICollection<Order> Orders { get; set; } = new List<Order>();
+
+    // Google Maps location
+    public double Latitude { get; set; }
+
+    public double Longitude { get; set; }
+
+    public ICollection<Order> Orders { get; set; } =
+        new List<Order>();
 }

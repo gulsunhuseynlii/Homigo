@@ -375,4 +375,23 @@ public class OrderService : IOrderService
             "{Count} reminder emails sent.",
             orders.Count);
     }
+    public async Task<PagedResult<OrderDto>> GetAllOrdersAsync(
+    OrderQueryDto query)
+    {
+        _logger.LogInformation(
+            "Admin requested all orders.");
+
+        var (orders, totalCount) =
+            await _orderRepository.GetAllOrdersAsync(
+                query.Page,
+                query.PageSize);
+
+        return new PagedResult<OrderDto>
+        {
+            Items = _mapper.Map<List<OrderDto>>(orders),
+            TotalCount = totalCount,
+            Page = query.Page,
+            PageSize = query.PageSize
+        };
+    }
 }

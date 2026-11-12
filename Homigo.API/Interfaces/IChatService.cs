@@ -9,4 +9,9 @@ public interface IChatService
     Task<List<ChatMessageDto>> GetMessagesAsync(
         int orderId,
         int currentUserId);
+
+    Task<int> GetUnreadCountAsync(int userId);
+    Task<int> GetUnreadCountAsync(
+    int userId,
+    int orderId);
 }

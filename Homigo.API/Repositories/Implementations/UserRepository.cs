@@ -57,5 +57,19 @@ public class UserRepository : GenericRepository<User>, IUserRepository
     {
         _context.Users.Update(user);
     }
+    public async Task<User?> GetUserWithRoleAsync(int userId)
+    {
+        return await _context.Users
+            .Include(x => x.Role)
+            .FirstOrDefaultAsync(x => x.Id == userId);
+    }
+    public async Task<User?> GetByRefreshTokenAsync(
+    string refreshToken)
+    {
+        return await _context.Users
+            .Include(u => u.Role)
+            .FirstOrDefaultAsync(
+                u => u.RefreshToken == refreshToken);
+    }
 
 }

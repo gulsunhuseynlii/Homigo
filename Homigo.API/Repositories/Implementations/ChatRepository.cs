@@ -1,5 +1,6 @@
 ﻿using Homigo.API.Data;
 using Homigo.API.Entities;
+using Homigo.API.Enums;
 using Homigo.API.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -57,5 +58,25 @@ public class ChatRepository : IChatRepository
         }
 
         await _context.SaveChangesAsync();
+    }
+    public async Task<int> GetUnreadCountAsync(int userId)
+    {
+        return await _context.ChatMessages
+            .CountAsync(x =>
+                x.ReceiverId == userId &&
+                !x.IsRead &&
+                x.Order.Status != OrderStatus.Completed &&
+                x.Order.Status != OrderStatus.Cancelled &&
+                x.Order.Status != OrderStatus.Rejected);
+    }
+    public async Task<int> GetUnreadCountAsync(
+    int userId,
+    int orderId)
+    {
+        return await _context.ChatMessages
+            .CountAsync(x =>
+                x.ReceiverId == userId &&
+                x.OrderId == orderId &&
+                !x.IsRead);
     }
 }

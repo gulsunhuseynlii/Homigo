@@ -16,4 +16,7 @@ public interface IUserRepository : IGenericRepository<User>
     Task AddVerificationTokenAsync(EmailVerificationToken token);
 
     Task UpdateUserAsync(User user);
+    Task<User?> GetUserWithRoleAsync(int userId);
+    Task<User?> GetByRefreshTokenAsync(
+    string refreshToken);
 }

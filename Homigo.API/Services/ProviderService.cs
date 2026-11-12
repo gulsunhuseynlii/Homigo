@@ -222,9 +222,28 @@ public class ProviderService : IProviderService
     {
         _logger.LogInformation("Getting all approved providers.");
 
-        var providers = await _providerRepository.GetAllApprovedAsync();
+        var providers =
+            await _providerRepository.GetAllApprovedAsync();
 
-        return _mapper.Map<List<ProviderDto>>(providers);
+        var result =
+            _mapper.Map<List<ProviderDto>>(providers);
+
+        foreach (var dto in result)
+        {
+            dto.AverageRating =
+                await _providerRepository
+                    .GetAverageRatingAsync(dto.UserId);
+
+            dto.ReviewCount =
+                await _providerRepository
+                    .GetReviewCountAsync(dto.UserId);
+
+            dto.CompletedOrders =
+                await _providerRepository
+                    .GetCompletedOrdersCountAsync(dto.UserId);
+        }
+
+        return result;
     }
 
     public async Task<ProviderDto?> GetByIdAsync(int id)

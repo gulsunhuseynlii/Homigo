@@ -17,4 +17,8 @@ public class UpdateAddressDto
     public string? Notes { get; set; }
 
     public bool IsDefault { get; set; }
+
+    public double Latitude { get; set; }
+
+    public double Longitude { get; set; }
 }

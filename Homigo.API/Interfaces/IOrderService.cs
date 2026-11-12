@@ -25,4 +25,6 @@ public interface IOrderService
     Task RejectOrderAsync(int orderId, int providerUserId);
     Task AutoCancelExpiredOrdersAsync();
     Task SendAppointmentRemindersAsync();
+    Task<PagedResult<OrderDto>> GetAllOrdersAsync(
+    OrderQueryDto query);
 }

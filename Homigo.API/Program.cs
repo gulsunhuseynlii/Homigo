@@ -4,6 +4,7 @@ using Hangfire;
 using Hangfire.SqlServer;
 using Homigo.API.Configurations;
 using Homigo.API.Data;
+using Homigo.API.Entities;
 using Homigo.API.Hubs;
 using Homigo.API.Interfaces;
 using Homigo.API.Jobs;
@@ -16,6 +17,7 @@ using Homigo.API.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -30,13 +32,16 @@ namespace Homigo.API
             // Add services to the container.
 
             builder.Services.AddControllers();
-
+            builder.Services.AddHttpClient();
             builder.Services.AddSignalR();
 
             builder.Services.AddSingleton<IUserIdProvider, UserIdProvider>();
 
             builder.Services.Configure<StripeSettings>(
     builder.Configuration.GetSection("Stripe"));
+
+            builder.Services.Configure<GeminiSettings>(
+     builder.Configuration.GetSection("Gemini"));
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
@@ -53,6 +58,7 @@ namespace Homigo.API
             builder.Services.AddScoped<IEmailService, EmailService>();
             builder.Services.AddScoped<IFileService, FileService>();
             builder.Services.AddScoped<IChatService, ChatService>();
+            builder.Services.AddScoped<IAiService, AiService>();
 
             builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
@@ -96,12 +102,16 @@ namespace Homigo.API
             Array.Empty<string>()
         }
     });
-            }); 
-            
+            });
+
             builder.Services.AddDbContext<AppDbContext>(options =>
             {
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+                options.UseSqlServer(
+                    builder.Configuration.GetConnectionString("DefaultConnection")
+                );
             });
+
+            builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 
 
             builder.Services.AddHangfire(config =>
@@ -189,6 +199,7 @@ namespace Homigo.API
             });
             Stripe.StripeConfiguration.ApiKey =
     builder.Configuration["Stripe:SecretKey"];
+
             var app = builder.Build();
 
 

@@ -18,4 +18,8 @@ public interface IEmailService
     string fullName,
     string serviceName,
     DateTime scheduledDate);
+    Task SendPasswordResetEmailAsync(
+    string email,
+    string fullName,
+    string resetUrl);
 }
